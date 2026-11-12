@@ -1,0 +1,14 @@
+# Encargo técnico para una fase posterior en Codex
+
+**No ejecutar en esta fase.** Primero leer todos los documentos de discovery y la versión vigente de reglas del concurso. Trabajar solo en el nuevo repositorio autorizado, en una rama de implementación nueva partiendo de la base que el propietario indique; nunca modificar UMBRAL original. Confirmar que la arquitectura y el alcance de discovery siguen vigentes. No crear proyectos Firebase, desplegar ni enviar candidatura sin autorización adicional.
+
+## Prompt
+
+> Construye un MVP web responsive de UMBRAL Hybrid AI centrado en oportunidades verificadas y un flujo breve: buscar/filtrar, leer ficha con requisitos y fuente, guardar en Mi Ruta y solicitar explicación contextual basada en fuente. Comienza por leer `PRODUCT_VISION`, requisitos, arquitectura, seguridad, diseño, onboarding, IA, backlog y riesgos. No reutilices código o activos del proyecto original automáticamente; verifica reglas del concurso y licencias antes de cualquier reutilización. Implementa módulos con puertos de catálogo, ruta y AI Logic; pruebas de dominio, seguridad y accesibilidad desde el primer incremento. Usa Firebase AI Logic para toda inferencia de IA del producto, no otros proveedores directos. Comprueba versiones y documentación oficiales vigentes; demuestra en un dispositivo compatible cada ruta local/solo nube/fallback, y no rotules la ejecución como local o nube salvo evidencia fiable. Trata las respuestas del modelo como no confiables, conserva citas, presenta errores y nunca inventes requisitos ni oportunidades. El catálogo debe tener fuentes oficiales, fechas y estados de revisión; sin datos reales aprobados usa fixtures claramente rotulados y no simules verificación. No expongas credenciales, no recolectes datos sensibles y configura reglas de acceso mínimas y App Check conforme a documentación. No crees proyectos ni despliegues. Aplica reduced motion, foco, teclado, saltar/repetir guía y responsive 320–1440 px, con zoom 200 %. Implementa primero happy path sin cuenta y almacenamiento local, explicando su limitación; sincronización solo si cabe y es segura. Antes de reportar, ejecuta tests, análisis estático y verificación visual accesible disponibles; registra versiones, dispositivos, resultados y pruebas no realizadas. No afirmes cumplimiento de WCAG ni del concurso sin evidencia. Informa cambios, riesgos, límites y pasos pendientes.
+
+## Puertas previas
+
+1. Confirmar reglas y elegibilidad actuales, licencias y base de código autorizada.
+2. Espiga técnica del SDK: disponibilidad real, fallback, señal de procedencia, formato, coste y descarga en hardware físico.
+3. Fuentes reales y permiso de uso; proyecto Firebase ya autorizado y límites de gasto.
+4. Lista de pruebas con datos, expectativas, dispositivos y criterios de salida acordados.
