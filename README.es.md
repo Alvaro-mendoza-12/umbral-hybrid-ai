@@ -13,6 +13,7 @@ UMBRAL Hybrid AI propone ayudar a las personas a encontrar oportunidades, entend
 3. Experiencia: sistema visual, animación y guía inicial.
 4. Tecnología: IA híbrida, seguridad Firebase y arquitectura de software.
 5. Entrega: calidad, backlog, concurso, riesgos, decisiones y encargo para Codex.
+6. Revisión: [matriz de trazabilidad](docs/REQUIREMENTS_TRACEABILITY.md) y [auditoría final](docs/FINAL_DISCOVERY_AUDIT.md).
 
 ## Límites y transparencia
 

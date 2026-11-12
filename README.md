@@ -14,6 +14,7 @@ UMBRAL Hybrid AI is a proposed opportunity companion that helps people find trus
 - [Hybrid AI](docs/HYBRID_AI_ARCHITECTURE.md), [Firebase security and privacy](docs/FIREBASE_SECURITY_PRIVACY.md), [software architecture](docs/SOFTWARE_ARCHITECTURE.md)
 - [Quality and testing](docs/QUALITY_AND_TEST_STRATEGY.md), [backlog and roadmap](docs/SCRUM_BACKLOG_AND_ROADMAP.md), [competition compliance](docs/HACKATHON_COMPLIANCE.md)
 - [Risk register](docs/RISK_REGISTER.md), [decision log](docs/DECISION_LOG.md), [implementation handoff](docs/CODEX_IMPLEMENTATION_HANDOFF.md)
+- [Requirements traceability](docs/REQUIREMENTS_TRACEABILITY.md) and [final discovery audit](docs/FINAL_DISCOVERY_AUDIT.md)
 
 Internal documents are in Spanish; the final jury-facing demo and submission must be prepared in English. Personas, metrics and feasibility are hypotheses or targets, not research findings. Opportunity links and dates need editorial verification; the official source remains authoritative. The legacy UMBRAL repository was inspected read-only. This phase does not create Firebase projects, deploy, alter the original, or submit an entry.
 

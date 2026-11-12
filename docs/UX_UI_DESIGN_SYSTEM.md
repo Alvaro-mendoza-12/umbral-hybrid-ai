@@ -51,7 +51,7 @@ Estos pares deben comprobarse sobre la interfaz real antes de aceptación; no se
 
 **SourceEvidence:** enlace oficial, revisión editorial y estado. Si falta un dato, mostrar «No informado por la fuente». No completar con IA salarios, fechas, elegibilidad ni condiciones que no estén documentadas.
 
-**Task:** acción, fecha voluntaria y estado pendiente/en curso/completado. El seguimiento de cada oportunidad tiene estado independiente: guardada/preparando/enviada/cerrada. Deshacer tras completar o quitar. «Abrir fuente» nunca equivale a «Postulación enviada».
+**Task:** acción, fecha voluntaria y estado pendiente/en curso/completada. El seguimiento de cada oportunidad tiene estado independiente: guardada/preparando/enviada/cerrada. Deshacer tras completar o quitar. «Abrir fuente» nunca equivale a «Postulación enviada».
 
 Estados mínimos por vista: cargando, lista útil, vacío inicial, sin coincidencias, sin conexión, fallo recuperable, contenido desactualizado, acceso restringido. El catálogo sigue siendo útil si la IA falla. Sin conexión se muestra fecha de caché; no se simula una actualización.
 
@@ -59,7 +59,7 @@ Estados mínimos por vista: cargando, lista útil, vacío inicial, sin coinciden
 
 | Ancho CSS | Composición | Comportamiento |
 |---|---|---|
-| 320 | Una columna, margen 16 | Navegación inferior de tres destinos; filtros en panel; títulos multilínea |
+| 320 | Una columna, margen 16 | Navegación inferior Explorar/Mi Ruta; ajustes en cabecera; filtros en panel; títulos multilínea |
 | 360 / 390 | Una columna, margen 16–20 | Lista, detalle y explicación como vistas separadas |
 | 768 | Una columna principal amplia, margen 24 | Barra superior; panel de filtros lateral solo si cabe |
 | 1024 | Navegación + contenido | Detalle y explicación pueden dividirse sin estrechar lectura |
@@ -109,3 +109,21 @@ Hipótesis de diseño, pendientes de validación: reducir la carga de elección 
 Objetivo WCAG 2.2 AA; revisar manualmente semántica, foco, lector de pantalla, errores, zoom y contraste. El análisis automático no demuestra conformidad. Usar `lang`, encabezados jerárquicos, landmarks, etiquetas visibles, estados mediante texto y aria-live moderado. ES/EN en UI y contenido curado donde exista traducción revisada; no alterar silenciosamente términos legales del origen. Fechas localizadas con zona explícita; evitar banderas como selector de idioma. Iconos siempre con texto en navegación primaria.
 
 Referencia normativa consultada 2026-11-12: [WCAG 2.2](https://www.w3.org/TR/WCAG22/), recomendación publicada mostrada por W3C: 12 diciembre 2024. Aplicación al producto y pruebas se detallan en QUALITY_AND_TEST_STRATEGY.md.
+
+## 10. Comprobación documental de pares de color
+
+Cálculo sRGB de luminancia relativa WCAG realizado el 12-11-2026 sobre valores hexadecimales, sin transparencias ni imagen de fondo. Es comprobación de tokens, **no** prueba de una interfaz ni declaración WCAG. Pares no enumerados, estados hover/disabled y superficies reales deben verificarse al implementar.
+
+| Primer plano / fondo | Ratio calculado |
+|---|---:|
+| #172033 / #FFFFFF | 16.27:1 |
+| #172033 / #F7F8FA | 15.31:1 |
+| #475569 / #FFFFFF | 7.58:1 |
+| #475569 / #F7F8FA | 7.13:1 |
+| #FFFFFF / #174C3C | 9.83:1 |
+| #172033 / #E4F0E9 | 13.90:1 |
+| #172033 / #D5EA77 | 12.29:1 |
+| #A82222 / #FFFFFF | 7.20:1 |
+| #1D4ED8 / #FFFFFF | 6.70:1 |
+
+El anillo de foco mantiene separación blanca; verificar también el contraste contra cada color adyacente y que no quede cubierto. No utilizar el acento claro como texto o borde funcional sobre blanco.

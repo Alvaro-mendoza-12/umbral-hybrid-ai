@@ -40,8 +40,8 @@ Versión discovery 1.0 · 2026-11-12. Estado: **especificados, no implementados 
 **Historia:** Como usuario quiero convertir una oportunidad en pocas tareas para comenzar.
 **Descripción:** Un objetivo activo y hasta tres tareas activas globales (pasos) editables, marcables y ordenables; creación manual siempre disponible y sugerencia IA opcional. Si ya existe objetivo, confirmar sustitución antes de sobrescribirlo.
 **Dependencias:** RF-SAVE-01, RF-AI-01 para sugerencias; RN-04/05/06.
-Los estados de tareas (pendiente/completada) son independientes del seguimiento de oportunidades (guardada/preparando/enviada/cerrada).
-**CA:** (1) La IA nunca guarda ni completa pasos sin acción del usuario. (2) Editar/quitar/completar funciona sin IA. (3) Se rechaza paso vacío y se explican límites de longitud. (4) Sustituir objetivo no borra oportunidades guardadas. (5) Fechas sugeridas se identifican como personales, distintas de fechas oficiales. (6) Se conserva estado ante un fallo de IA.
+Los estados de tareas (pendiente/en curso/completada) son independientes del seguimiento de oportunidades (guardada/preparando/enviada/cerrada).
+**CA:** (1) La IA nunca guarda ni completa pasos sin acción del usuario. (2) Editar/quitar/completar funciona sin IA. (3) Se rechaza paso vacío y se explican límites de longitud. (4) Sustituir objetivo no borra oportunidades guardadas. (5) Fechas sugeridas se identifican como personales, distintas de fechas oficiales. (6) Se conserva estado ante un fallo de IA. (7) Una cuarta tarea activa se rechaza sin borrar las tres existentes; completar una libera un cupo y reabrirla requiere cupo disponible. (8) Pendiente y en curso cuentan como activas; completada no.
 
 ### RF-PROFILE-01 · Preferencias mínimas · Must · U · UC-05
 **Historia:** Como usuario quiero elegir idioma y preferencias de inferencia sin entregar información innecesaria.
@@ -61,7 +61,7 @@ Los estados de tareas (pendiente/completada) son independientes del seguimiento 
 **Historia:** Como usuario quiero una explicación de los requisitos de la ficha actual, no una respuesta genérica.
 **Descripción:** Sólo «Explicar requisitos» y «Preparar mis próximos pasos». Contexto limitado a campos de la ficha y texto voluntario mínimo; todas las inferencias mediante Firebase AI Logic.
 **Dependencias:** RF-CAT-02, RF-AI-02/03; RN-04/07/08/09.
-**CA:** (1) Respuesta separa requisitos sustentados y sugerencias. (2) Toda afirmación de requisito se vincula al campo/fuente suministrado. (3) Si falta información, lo indica; no crea enlaces, fechas ni admisión. (4) Salida se valida contra contrato y límites; inválida produce error recuperable, nunca HTML sin sanitizar. (5) No mantiene conversación abierta ni memoria de varios turnos como requisito de local. (6) Cancelación impide insertar una respuesta obsoleta.
+**CA:** (1) Respuesta separa requisitos sustentados y sugerencias. (2) Toda afirmación de requisito se vincula al campo/fuente suministrado. (3) Si falta información, lo indica; no crea enlaces, fechas ni admisión. (4) Salida se valida contra contrato y límites; inválida produce error recuperable, nunca HTML sin sanitizar. (5) No mantiene conversación abierta ni memoria de varios turnos como requisito de la ruta local. (6) Cancelación impide insertar una respuesta obsoleta.
 
 ### RF-AI-02 · Orquestación y control de destino · Must · U/S · UC-06
 **Historia:** Como usuario quiero saber y controlar cuándo sale información de mi dispositivo.
@@ -99,7 +99,7 @@ Los estados de tareas (pendiente/completada) son independientes del seguimiento 
 | UC-06 Explicar | U; contexto válido | Elegir tarea, evaluar capacidad, ejecutar, validar, mostrar evidencia | Offline/cancelación/fallo conserva ficha y ofrece acción manual |
 | UC-07 Curar | E autorizado | Revisar fuente, validar esquema, publicar versión | Campos insuficientes impiden publicación |
 | UC-08 Sincronizar | U; Should implementado | Iniciar sesión, confirmar vinculación, sincronizar | Conflicto requiere resolución; no pérdida silenciosa |
-| UC-09 Guía | V/U | Resaltar elemento, avanzar, terminar | Omitir/restaurar foco; repetir desde ajustes |
+| UC-09 Guía | V/U | Resaltar elemento, avanzar, terminar | Omitir/restaurar foco; repetir desde Ayuda, accesible en Perfil/Ajustes |
 
 ## 5. Reglas de negocio
 
@@ -118,3 +118,5 @@ Los estados de tareas (pendiente/completada) son independientes del seguimiento 
 ## 6. Fuentes y trazabilidad
 
 Requisitos derivados de la misión del propietario, de [PRODUCT_VISION](PRODUCT_VISION.md) y [USER_PERSONAS_AND_JOURNEYS](USER_PERSONAS_AND_JOURNEYS.md). Matriz técnica: [HYBRID_AI_ARCHITECTURE](HYBRID_AI_ARCHITECTURE.md). Referencias externas de diseño de controles, elaboración 2026-11-12; verificación web en documentos especializados: [Firebase AI Logic](https://firebase.google.com/docs/ai-logic), [WCAG 2.2](https://www.w3.org/TR/WCAG22/). No se atribuyen las decisiones de negocio propias a estos organismos.
+
+La matriz [REQUIREMENTS_TRACEABILITY](REQUIREMENTS_TRACEABILITY.md) vincula cada requisito a componente, decisión y casos de prueba. Todos los casos de producto siguen pendientes.

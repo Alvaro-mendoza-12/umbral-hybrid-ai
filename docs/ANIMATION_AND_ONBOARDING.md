@@ -4,7 +4,7 @@ Estado: storyboard y contrato de comportamiento; no animación implementada. Fec
 
 ## Objetivo y límites
 
-Dar identidad sin convertir una introducción en barrera. La interfaz y sus acciones se cargan inmediatamente. La animación es una capa decorativa no modal, `aria-hidden`, sin capturar puntero ni foco. Cualquier interacción del usuario la cancela. No esperar a descargar un modelo de IA ni a autenticar para mostrar Explorar.
+Dar identidad sin convertir una introducción en barrera. La interfaz y sus acciones se cargan inmediatamente. La animación es una capa decorativa no modal, `aria-hidden`, sin capturar puntero ni foco. Cualquier interacción del usuario la cancela antes de activar el control subyacente; no usar una máscara opaca que oculte acciones disponibles. Un foco que entra en la interfaz también cancela la capa. No esperar a descargar un modelo de IA ni a autenticar para mostrar Explorar.
 
 Solo se reproduce automáticamente una vez por versión de introducción en ese navegador. El onboarding se ofrece tras la primera entrada y se inicia con «Ver guía»; se puede omitir en esa misma invitación. Así se conserva una entrada guiada sin un modal que asalte a cada visitante. La guía manual siempre está en Ayuda. No se infiere que todos los visitantes deseen animación.
 

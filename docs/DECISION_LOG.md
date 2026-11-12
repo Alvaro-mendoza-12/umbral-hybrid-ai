@@ -13,6 +13,9 @@
 | ADR-07 | Acceso sin cuenta y ruta local; sincronización opcional condicionada al plazo | Menos fricción; advertir pérdida por borrado de datos locales. |
 | ADR-08 | Onboarding omitible, reproducible y reduced motion | Acceso inmediato y accesibilidad; guía anclada a elementos reales. |
 | ADR-09 | No implementar ni desplegar en fase discovery | Encargo explícito. |
+| ADR-10 | Contratos canónicos y límites de datos | Diccionario en arquitectura de información; estados de tarea separados de oportunidad; un objetivo de 120 caracteres y tres tareas activas de 200 caracteres. Revisable con investigación. |
+| ADR-11 | Aceptación basada en evidencia trazable | Cada RF/RNF se vincula a componente y prueba; 30 casos IA críticos; pruebas pendientes no se marcan cumplidas. |
+| ADR-12 | ES/EN y navegación accesible mínima | Explorar y Mi Ruta primarios; ajustes/ayuda secundarios; diseño desde 320 px, reflow y movimiento reducido. |
 
 ## Pendientes del propietario/equipo
 

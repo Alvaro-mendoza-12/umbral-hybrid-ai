@@ -36,7 +36,7 @@ No se concluye que los competidores carezcan de asistentes, rutas o accesibilida
 
 ### Política de investigación y actualización propuesta
 
-Cada oportunidad debe contener `sourceUrl`, `provider`, `countryEligibility`, `language`, `deadline`, `timezone`, `status`, `verifiedAt`, `verificationMethod`, `requirementsVersion` y responsable de revisión. «Verificada» significa que se contrastó la información con una fuente identificada en una fecha; no garantiza admisión, ausencia absoluta de fraude ni disponibilidad futura. Fechas ambiguas permanecen como desconocidas y bloquean recomendaciones urgentes. El registro conserva originales y traducciones separados. El MVP utiliza curación manual, no rastreo indiscriminado.
+El esquema canónico está en [INFORMATION_ARCHITECTURE](INFORMATION_ARCHITECTURE.md): `sourceUrl`, `providerName`, `eligibleCountries`/`eligibilityText`, `sourceLanguage`, `deadline` (incluida precisión y zona cuando exista), `status`, `verifiedAt`, `reviewBy` y `sourceVersion`. El registro editorial separado añade método y responsable de revisión; no expone información personal del editor. «Verificada» significa que se contrastó la información con una fuente identificada en una fecha; no garantiza admisión, ausencia absoluta de fraude ni disponibilidad futura. Fechas ambiguas permanecen como desconocidas y bloquean recomendaciones urgentes. El registro conserva originales y traducciones separados. El MVP utiliza curación manual, no rastreo indiscriminado.
 
 ## 4. Segmentos y necesidades: hipótesis de trabajo
 
@@ -76,7 +76,7 @@ Registrar éxito sin ayuda, acciones, tiempo, errores, abandono, comprensión de
 
 | Base | Decisión concreta de UMBRAL | Comprobación propuesta |
 |---|---|---|
-| Carga cognitiva y claridad [S10] | Formulario inicial mínimo: objetivo y país; perfil opcional progresivo; resumen con costo, cierre y requisitos antes de detalle | Medir dudas, retrocesos y abandono; no ocultar información crítica por minimalismo |
+| Carga cognitiva y claridad [S10] | Sin formulario obligatorio: objetivo de búsqueda y país opcionales; perfil opcional progresivo; resumen con costo, cierre y requisitos antes de detalle | Medir dudas, retrocesos y abandono; no ocultar información crítica por minimalismo |
 | Reconocimiento frente a recuerdo [S11] | Etiquetas visibles «Explorar», «Mi Ruta», «Guardados»; filtros activos legibles; siguiente paso persistente | Reanudar tarea tras interrupción sin recordar comandos ni conversaciones |
 | Divulgación progresiva [S12] | Resumen primero y requisitos completos bajo expansión; filtros avanzados en panel | Encontrar fuente y exclusiones sin ayuda; no esconderlas tras múltiples capas |
 | Atención y accesibilidad cognitiva [S13–S15] | Sin carruseles automáticos, banners pulsantes ni interrupciones; ruta corta con estado actual y pasos pendientes | Sesiones interrumpidas, teclado y lectura; confirmar que el usuario puede volver al punto previo |

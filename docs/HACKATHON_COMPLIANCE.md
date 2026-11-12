@@ -1,6 +1,6 @@
 # Hackathon compliance and competition strategy
 
-Status: discovery baseline, not an eligibility certification or submitted entry. Reviewed: 2026-11-12. Jury-facing document in English. No application, submission, deployment, or runtime evidence has been created by this document.
+Status: discovery baseline, not an eligibility certification or submitted entry. Independently rechecked: 2026-11-12. Jury-facing document in English. No application, submission, deployment, or runtime evidence has been created by this document.
 
 ## 1. Requirements published on the event overview (not the complete legal rules)
 
@@ -15,13 +15,20 @@ Status: discovery baseline, not an eligibility certification or submitted entry.
 - Awards: Grand Prize USD 10,000; runners-up USD 7,000 and 4,000; best iOS, Android, Web/Chrome USD 3,000 each. Total USD 30,000.
 - Judging: technical implementation, design, potential impact, and idea quality. Multiplatform receives strong consideration; a single-platform project can still win.
 
-## 2. Deadline and unresolved legal rules
+## 2. Deadline and newly accessible legal rules
 
-[Official schedule](https://firebasehybridaihackathon.devpost.com/details/dates), accessed 2026-11-12: submissions November 11, 09:00 PST to November 30, 14:00 PST; judging December 9–16; winners December 21. Deadline conversion: **November 30, 2026, 17:00 Peru (UTC−05:00), equal to 22:00 UTC**. PST is UTC−08:00, so Peru is three hours ahead. Do not confuse PST with daylight time.
+[Official schedule](https://firebasehybridaihackathon.devpost.com/details/dates), rechecked 2026-11-12: submissions November 11, 13:30 PST to November 30, 14:00 PST. Deadline: **November 30, 2026, 17:00 Peru (UTC−05:00), equal to 22:00 UTC**. The earlier 09:00 opening time is superseded. Schedule shows judging December 9 and announcement December 21 at 14:00; legal rules show judging December 10 and announcement around December 21 at noon. Closing time agrees; reconfirm the other dates before relying on them.
 
-[Official Rules URL](https://firebasehybridaihackathon.devpost.com/rules): direct retrieval returned HTTP 403 on this review. Search-indexed text reports that rules are not yet available. These are different observations: an index can be stale, and a blocked live request does not establish absence. Therefore **full current legal rules are unverified**. The main page is usable evidence of published submission expectations, not a substitute for the complete legal rules.
+[Official Rules](https://firebasehybridaihackathon.devpost.com/rules), successfully retrieved 2026-11-12, supersede the earlier access-blocked finding. Key owner-review points (not legal advice):
 
-Unresolved: excluded jurisdictions, individual/team eligibility details, intellectual-property warranties, whether prizes can be combined, pre-existing-code boundaries, and any conflicts with the earlier UMBRAL contest. Do not invent an exclusion list or guarantee that a Peruvian entrant is eligible. Before entry, the owner must read the accessible current rules and resolve these points. No contest terms were accepted in this phase.
+- Majority age; Taiwan requires 20. Excluded: Brazil, Italy, Quebec, Crimea, Cuba, Iran, Syria, North Korea, Sudan, Belarus, Russia, plus sanctions/export restrictions. Peru is not expressly listed; eligibility is not thereby established.
+- Government-agency employment, contest-entity relationships and conflicts can disqualify. Team members must all qualify; organizational entry needs authority.
+- Disclose incorporated prior work and significant competition-period improvements. Verify third-party rights, ownership and prior sponsorship restrictions.
+- Ownership remains with entrants; entry grants Google a broad perpetual, irrevocable, royalty-free evaluation/promotional license.
+- One grand prize and one Best-of prize may combine. Judging criteria are equally weighted.
+- Entry accepts binding terms, including legal releases and dispute provisions. No entry or acceptance occurred here.
+
+Owner eligibility, original-project obligations and rights are **pending**, not certified. Keep personal eligibility evidence outside this public repository. This review changes the legal-information status from inaccessible to available, not the project's compliance status.
 
 ## 3. Evidence-based release gate
 
@@ -29,7 +36,7 @@ Every item below is a **release gate**, not a claim that the production entry ha
 
 | ID | Gate | Required evidence | Owner |
 |---|---|---|---|
-| HC-01 | Complete legal rules reviewed | Dated owner review and applicable eligibility decisions | Product owner |
+| HC-01 | Owner eligibility and legal review | Rules now retrieved; owner assessment of eligibility, IP, obligations and terms remains pending | Product owner |
 | HC-02 | Original UMBRAL protected | Separate repository URL; diff and history limited to new repository | Engineering |
 | HC-03 | New work identified | Baseline SHA and dated change ledger; attribution of any permitted reuse | Engineering |
 | HC-04 | Hybrid inference genuinely runs | Real local and cloud traces, platform versions, provenance and failure tests | AI/QA |
@@ -42,7 +49,7 @@ Every item below is a **release gate**, not a claim that the production entry ha
 | HC-11 | Final rules rechecked | Manual recheck on November 29 and before owner submission | Product owner |
 | HC-12 | Submission authorized | Owner performs/authorizes submission after legal review | Product owner |
 
-No background monitoring is implied. HC-11 is a scheduled project activity, not an automation installed by this phase. Publishing the repository, adding a legal license, hosting an app, or submitting the entry are not performed here.
+No background monitoring is implied. HC-11 is a scheduled project activity, not an automation installed by this phase. Only documentation publication is authorized in this mission. Adding a legal license, hosting an app, or submitting the entry is outside this review; actual branch publication is recorded separately in the final audit.
 
 ## 4. Recommended competitive position
 

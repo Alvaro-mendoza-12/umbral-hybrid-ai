@@ -50,7 +50,7 @@ La meta de tres activaciones no aplica artificialmente a alta de cuenta, edició
 
 ## 5. Plan de investigación real
 
-Separar dos etapas: investigación exploratoria con 8–12 adultos de los dos segmentos prioritarios y prueba formativa del MVP con 5 participantes. Reclutar procurando diversidad de familiaridad digital y al menos una persona que utilice tecnología asistiva si es posible. Consentimiento, explicación de que no se evalúa a la persona, tareas sin datos privados, posibilidad de parar y eliminación de notas identificables. No grabar sin autorización específica.
+Separar dos etapas: investigación exploratoria con 8–12 adultos entre los cuatro segmentos, dando mayor representación a los dos prioritarios y prueba formativa del MVP con 5 participantes. Reclutar procurando diversidad de familiaridad digital y al menos dos sesiones con personas que utilicen tecnologías de apoyo o tengan necesidades de accesibilidad, mediante reclutamiento voluntario; si no se logra, registrar la limitación. Consentimiento, explicación de que no se evalúa a la persona, tareas sin datos privados, posibilidad de parar y eliminación de notas identificables. No grabar sin autorización específica.
 
 Preguntas no dirigidas: «Cuéntame la última vez que buscaste una oportunidad»; «¿Cómo comprobaste que podías postular?»; «Muéstrame qué harías a continuación». Evitar «¿Te gustaría una IA que…?». Observar búsqueda, lectura de requisitos, guardado y definición del paso siguiente. Separar lo observado de lo dicho y de la interpretación del investigador.
 
@@ -64,4 +64,4 @@ Referencias primarias para el método y controles, fecha de elaboración 2026-11
 
 ### Relación entre investigación y prueba de interfaz
 
-Una exploración inicial propuesta de 8–12 personas en cuatro segmentos puede complementar una prueba formativa posterior del MVP con cinco participantes; tienen fines distintos y no son muestras representativas. Si se realiza una sesión preliminar de 5–8 con menos segmentos, será piloto y se documentará su alcance; ninguna de estas actividades se ha ejecutado. En Explorar se puede guardar directamente desde el resultado (una activación) o abrir primero la ficha y guardar allí (dos); ambas rutas conservan la posibilidad de revisar la fuente.
+La exploración de 8–12 personas investiga necesidades; la prueba formativa posterior del MVP usa cinco participantes para observar tareas. Ninguna etapa es representativa ni ha sido ejecutada. Si la capacidad exige un piloto menor, registrar el recorte y sus límites antes de interpretar resultados. Guardar desde Explorar tiene una vía directa de una activación y una vía de revisión de ficha de dos; ambas permiten consultar la fuente.

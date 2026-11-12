@@ -45,7 +45,7 @@ No recolectar DNI, pasaporte, fecha exacta de nacimiento, discapacidad, salud, f
 - «Solo local» es una restricción dura: un error no permite cambiar a nube. Si el modelo local no está disponible, ofrecer información original y acciones deterministas.
 - En modo híbrido autorizado, informar la ruta realmente utilizada. Una ejecución local no significa que toda la aplicación sea offline o que sincronización/atestación no use red.
 - Revisar configuración de logs y monitoring antes de activar trazas: no enviar prompts, resultados, correos ni identificadores de perfil a telemetría.
-- Borrado de cuenta debe borrar también los documentos de usuario y caché propia; borrar Authentication por sí solo no prueba ese resultado. Añadir exportación sencilla de Mi Ruta.
+- Borrado de cuenta debe borrar también los documentos de usuario y caché propia; borrar Authentication por sí solo no prueba ese resultado. La exportación sencilla de Mi Ruta es Could, no condición del MVP; si se incorpora, verificar alcance y ausencia de datos ocultos.
 
 ## 5. Autorización propuesta
 
@@ -53,7 +53,7 @@ Si se adopta Firestore, modelo `opportunities/{id}`: lectura de oportunidades pu
 
 Casos negativos obligatorios en Emulator Suite: usuario A no lee/escribe B; anónimo no escribe; cliente no publica oportunidades ni se asigna rol; campos extra/URLs peligrosas rechazados; documentos sobredimensionados rechazados; consultas no autorizadas denegadas. Las reglas no son filtros: diseñar consultas que satisfagan la política. Acceso de servidor con IAM mínimo y pruebas separadas.
 
-Las claves de configuración Firebase identifican el proyecto; no son autorización. No confundirlas con claves Gemini ni credenciales privadas. Mantener clave Gemini fuera del frontend y repositorio. Restringir API y aplicación, establecer cuotas y revisar permisos del proyecto. [Checklist de seguridad AI Logic](https://firebase.google.com/docs/ai-logic/security-checklist).
+Las claves de configuración Firebase identifican el proyecto; no son autorización. No confundirlas con claves Gemini ni credenciales privadas. La FAQ vigente indica que desde mediados de 2026 la autorización usa una cuenta de servicio gestionada por Google (P4SA), no claves Gemini estándar. No generar una clave Gemini como paso del MVP; cualquier credencial heredada o de servicio debe quedar fuera de frontend y repositorio. Restringir API y aplicación, establecer cuotas y revisar permisos del proyecto. [Checklist de seguridad AI Logic](https://firebase.google.com/docs/ai-logic/security-checklist).
 
 ## 6. Amenazas y mitigaciones verificables
 
@@ -73,8 +73,18 @@ No implementar postulaciones, mensajes a empleadores ni decisiones sobre persona
 
 ## 7. Operación y puertas de salida
 
-Antes de exposición pública: propietario confirma proyecto/proveedor/región/presupuesto; App Check y reglas probados; ningún secreto en historia git; modo debug excluido; política de privacidad breve visible; borrado/exportación ejercitados; fallback sin IA probado; enlaces de fuente revisados; consultas limitadas/paginadas; configuración versionada con rollback.
+Antes de exposición pública: propietario confirma proyecto/proveedor/región/presupuesto; App Check probado y, si se usa Firestore, reglas probadas; ningún secreto en historia git; modo debug excluido; política de privacidad breve visible; borrado local ejercitado, borrado de cuenta si existe y exportación probada solo si se incorpora; fallback sin IA probado; enlaces de fuente revisados; consultas limitadas/paginadas; configuración versionada con rollback.
 
 Ante incidente: desactivar IA y escritura no esencial mediante configuración/controles del servicio; conservar evidencia minimizada; revocar credenciales afectadas; identificar datos y usuarios alcanzados; definir comunicación conforme a obligaciones reales. No confiar únicamente en un flag del cliente para frenar abuso. Un aviso presupuestario no sustituye un límite técnico.
 
 Pendientes: elección formal del proveedor y sus condiciones; presupuesto; revisión jurídica de política internacional; ensayo de consentimiento y borrado; evaluación de privacidad de las trazas del proveedor. No se afirma certificación ISO, cumplimiento normativo integral ni prueba de penetración realizada.
+
+## 8. Costos, cuotas y datos de la solicitud: cierre de auditoría
+
+Reverificado el **12-11-2026**. AI Logic no añade cargo por su uso, pero el proveedor/modelo/función puede facturar. Gemini Developer API ofrece acceso limitado sin facturación en Spark; al vincular facturación, su uso pasa a pago por consumo y puede requerir prepago. Agent Platform Gemini API requiere Blaze. No se ha elegido ni habilitado proveedor, proyecto, facturación o cuota. El presupuesto exacto necesita modelo, volumen y tarifas vigentes: no existe aquí una promesa de costo cero. [Precios oficiales](https://firebase.google.com/docs/ai-logic/pricing).
+
+Las cuotas dependen de modelo/proveedor/proyecto. La documentación indica límite AI Logic inicial de 100 solicitudes/minuto por usuario; no es un presupuesto recomendado ni garantiza capacidad. Un 429 puede significar cuota o capacidad agotada. Ajustar límites requiere permiso `serviceusage.quotas.update`; no otorgar Owner/Editor únicamente por comodidad. Proponer límites conservadores después de medir demanda, con espera/cancelación y máximo un reintento controlado, nunca bucle. [Cuotas](https://firebase.google.com/docs/ai-logic/quotas).
+
+Contrato de minimización UMBRAL: cuando se autoriza nube, enviar únicamente los fragmentos públicos seleccionados, idioma, instrucción de tarea y esquema/configuración necesarios. No enviar el perfil, otras oportunidades guardadas ni historial. El transporte del servicio también puede incluir configuración del proyecto, token App Check y metadatos técnicos; verificar tráfico y documentación de privacidad antes de publicar. `LOCAL_ONLY` impide el envío del prompt al modelo remoto, pero no equivale a cero conexiones de la aplicación. Esta es una política propuesta, no una captura de red realizada.
+
+La checklist general recomienda controles que no son todos aplicables al MVP: las plantillas de servidor no están soportadas en el flujo híbrido; no adoptarlas como mitigación ficticia. El modo de usuarios autenticados es opcional y de alcance de proyecto; activarlo cambiaría la decisión de asistencia sin cuenta y debe registrarse antes de implementarlo. App Check no valida que el prompt sea benigno ni sustituye Rules/IAM. [Checklist de seguridad](https://firebase.google.com/docs/ai-logic/security-checklist), [FAQ de autorización y App Check](https://firebase.google.com/docs/ai-logic/faq-and-troubleshooting).

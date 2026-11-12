@@ -35,7 +35,7 @@ flowchart LR
 
 El catálogo debe distinguir `verifiedAt` (se comprobó fuente) de `reviewBy` (revisión pendiente); el enlace oficial es la autoridad y la verificación no garantiza validez futura. Versionar esquema y validar datos al importar. Los datos de prueba deben rotularse como tales, sin oportunidades inventadas en demo presentada como real.
 
-Contrato conceptual `explain(context, preference) -> {status, text, sourceRefs, requestedMode, executionEvidence?}`. El estado distingue éxito, no disponible, sin red, cancelado, error o formato inválido. El SDK web documenta `response.inferenceSource` como fuente local/nube; comprobarlo con la versión real en integración. Si falta o no se puede validar, informar `unknown`, nunca inferirlo de la preferencia solicitada. Validar salida y mostrar enlaces; ningún resultado de modelo determina elegibilidad.
+Contrato conceptual `explain(context, preference) -> {status, result?}`: el `result` exitoso usa el DTO canónico definido en HYBRID_AI_ARCHITECTURE (`requestId`, `schemaVersion`, `summary`, `actions`, `unknowns`, `source`, `requestedMode`, `sourceVersion`, `latencyMs`); sus identificadores de evidencia vinculan fragmentos y fuentes del catálogo. El estado distingue éxito, no disponible, sin red, cancelado, error o formato inválido. El SDK web documenta `response.inferenceSource` como fuente local/nube; comprobarlo con la versión real en integración. Si falta o no se puede validar, informar `unknown`, nunca inferirlo de la preferencia solicitada. Validar salida y mostrar enlaces; ningún resultado de modelo determina elegibilidad.
 
 ## Flujos
 

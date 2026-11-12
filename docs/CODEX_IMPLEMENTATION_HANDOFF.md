@@ -12,3 +12,23 @@
 2. Espiga técnica del SDK: disponibilidad real, fallback, señal de procedencia, formato, coste y descarga en hardware físico.
 3. Fuentes reales y permiso de uso; proyecto Firebase ya autorizado y límites de gasto.
 4. Lista de pruebas con datos, expectativas, dispositivos y criterios de salida acordados.
+
+## Secuencia ejecutable y puertas de salida
+
+Cada incremento produce un commit pequeño en una rama independiente de implementación creada desde la base autorizada; no mezclar ni hacer push, PR, merge o despliegue sin que estén dentro de la autorización vigente. Si el repositorio o rama base ya contiene trabajo nuevo, inspeccionar el historial y no sobrescribirlo. Proponer tecnologías concretas tras revisar el entorno; no importar automáticamente el código del proyecto original.
+
+1. **Arranque y trazabilidad.** Leer los 19 documentos originales, matriz y auditoría final; validar instrucciones del repositorio, dependencias, licencias y configuración. Convertir cada requisito Must en tareas y casos enlazados; registrar todo bloqueo y discrepancia. **Salida:** plan por incrementos, ramas y comprobación de que no se modifica el repositorio original.
+2. **Núcleo sin IA.** Crear shell ES/EN accesible, catálogo curado versionado, búsqueda/filtros, ficha y origen, y Mi Ruta local (un objetivo y hasta tres tareas activas). **Salida:** tests de esquema, filtros, fechas, persistencia, errores y teclado; datos de demostración identificados como tales si no existen fichas reales verificadas.
+3. **Espiga híbrida y adaptación.** Con proyecto Firebase previamente autorizado y dispositivo compatible, comprobar versiones reales, App Check, disponibilidad y descarga; ejecutar local y nube con Firebase AI Logic y registrar `inferenceSource`. Ejercitar los cuatro modos y las restricciones de privacidad documentadas. Separar mocks de pruebas reales. **Salida:** registro reproducible con navegador/SO/SDK/modelo, casos de indisponibilidad, offline, límites, coste observado y errores; no afirmar funcionamiento sin evidencia. Si faltan permisos, dispositivo o configuración, registrar bloqueo y avanzar en el núcleo sin simular éxito.
+4. **IA contextual.** Implementar explicación y pasos con el texto de fuente permitido, controles de consentimiento y validación del resultado; no enviar datos sensibles innecesarios. `ONLY_ON_DEVICE` no debe cambiar silenciosamente a nube. **Salida:** unitarias y de integración de selección, fallos y validación, más comprobación humana de fidelidad contra el corpus definido; mostrar procedencia solo si se verifica.
+5. **Experiencia y QA.** Implementar entrada de marca no bloqueante, guía de hasta cuatro pasos, omisión/repetición, foco y movimiento reducido. Ensayar 320, 360, 390, 768, 1024, 1280 y 1440 CSS px, vertical/horizontal cuando aplique y zoom 200 %. **Salida:** evidencia de teclado, lector, reflujo, contraste, errores, E2E de buscar→detalle→guardar→ruta→explicar, pruebas de seguridad y accesibilidad; distinguir automática, manual, mock y dispositivo real.
+6. **Cierre de incremento.** Revisar dependencias, permisos, secretos, enlaces y documentación de arranque; ejecutar suite disponible y documentar qué pasó, falló o no se ejecutó, con causa. Preparar demo y materiales en inglés sin publicarlos ni aceptar condiciones. No marcar WCAG, elegibilidad o aplicación como aprobados a partir de una revisión documental.
+
+## Evidencia y restricciones innegociables
+
+- Registrar comando, fecha, entorno, resultado y artefacto o registro correspondiente; nunca inventar capturas, resultados o entrevistas.
+- No incluir credenciales, API keys privadas, tokens de debug, datos personales sensibles, ZIP ni bundles en el árbol fuente.
+- El catálogo muestra estado de vigencia y fuente primaria; no autocompletar datos faltantes ni tratar una sugerencia como garantía de elegibilidad.
+- Las pruebas de seguridad cubren acceso cruzado si existe sincronización, denegación de permisos, inyección en contenido de fuente, cuotas y salida insegura. Los controles Firebase solo se activan tras autorización de proyecto/gasto.
+- El cierre del concurso debe cotejarse con las reglas legales oficiales entonces disponibles. No prometer premios ni hacer candidatura.
+- Solicitar al propietario únicamente lo que realmente bloquee: proyecto Firebase autorizado, derechos de reutilización/fuentes, dispositivos y decisión sobre licencia/categoría, sin pedir contraseñas ni códigos en el chat.

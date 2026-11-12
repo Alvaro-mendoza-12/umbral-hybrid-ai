@@ -4,7 +4,7 @@ Discovery · 2026-11-12 · Diseño propuesto, no interfaz implementada.
 
 ## 1. Principio organizador
 
-La oportunidad, no la conversación, es la unidad central. Navegación primaria mínima: **Explorar** y **Mi Ruta**; **Perfil/Ajustes** es destino secundario accesible desde encabezado (puede aparecer como tercer destino en móvil si las pruebas lo justifican). No colocar un buscador global, un asistente flotante, un feed y un catálogo compitiendo por atención en la misma vista.
+La oportunidad, no la conversación, es la unidad central. Navegación primaria del MVP: **Explorar** y **Mi Ruta**; **Perfil/Ajustes** es destino secundario accesible desde encabezado. En móvil la barra inferior contiene los dos destinos primarios, con texto e icono. Ayuda está dentro de Perfil/Ajustes; un tercer destino sólo se reconsidera tras evidencia de uso. No colocar un buscador global, un asistente flotante, un feed y un catálogo compitiendo por atención en la misma vista.
 
 ```mermaid
 flowchart TD
@@ -80,7 +80,7 @@ erDiagram
     LOCAL_OR_AUTH_USER ||--|| PREFERENCES : selects
 ```
 
-`SavedOpportunity` conserva opportunityId, estado declarado y timestamps. `ActiveRoute` contiene objetivo, referencia opcional y hasta tres `RouteStep` activos globales con texto, estado de tarea (pendiente/en curso/completada), separado del seguimiento de la oportunidad, y fecha personal opcional. `Preferences` guarda locale, país de interés opcional y preferencia de inferencia. No almacenar respuesta completa de IA por defecto; guardar sólo los pasos que la persona confirme. Si se ofrece sincronización, separar datos privados por UID y resolver versiones; los guardados locales no se publican en el catálogo.
+Nombres conceptuales equivalentes: `SavedOpportunity` = `OpportunityTracking` y `RouteStep` = `Task`; la implementación elegirá los segundos como nombres canónicos de tipos. `SavedOpportunity` conserva opportunityId, estado declarado y timestamps. `ActiveRoute` contiene objetivo, referencia opcional y hasta tres `RouteStep` activos globales (pendiente o en curso; completada no consume cupo) con texto, estado de tarea (pendiente/en curso/completada), separado del seguimiento de la oportunidad, y fecha personal opcional. `Preferences` guarda locale, país de interés opcional y preferencia de inferencia. No almacenar respuesta completa de IA por defecto; guardar sólo los pasos que la persona confirme. Si se ofrece sincronización, separar datos privados por UID y resolver versiones; los guardados locales no se publican en el catálogo.
 
 ## 6. Búsqueda y orden
 
@@ -105,3 +105,5 @@ Mensajes orientados a recuperación: «No pudimos guardar en este dispositivo» 
 Explorar → RF-CAT-01, RF-SEARCH-01; ficha → RF-CAT-02, RF-AI-01/03; Mi Ruta → RF-SAVE-01, RF-ROUTE-01; ajustes → RF-PROFILE-01, RF-I18N-01, RF-ONB-01. Accesibilidad transversal → RNF-A11Y-01/02.
 
 Referencias de base, elaboración 2026-11-12; verificación web en documentos especializados: [WAI: estructura de páginas](https://www.w3.org/WAI/tutorials/page-structure/), [WAI: formularios](https://www.w3.org/WAI/tutorials/forms/), [WCAG 2.2](https://www.w3.org/TR/WCAG22/). La taxonomía, rutas y esquema son decisiones propias para el MVP, no estándares impuestos por esas fuentes.
+
+Límites de entrada del MVP: objetivo 1–120 caracteres, tarea 1–200, tras recortar espacios. El cuarto paso activo requiere completar o quitar otro; no se eliminan datos automáticamente. `verifiedAt` y `reviewBy` son fechas UTC y `sourceVersion` es una cadena de versión, no una fecha.

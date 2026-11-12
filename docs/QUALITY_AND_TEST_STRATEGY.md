@@ -4,7 +4,7 @@ Fecha: 2026-11-12. Estado: plan, no informe de ejecución. Ninguna prueba de pro
 
 ## 1. Referencias vigentes y aplicación proporcionada
 
-Investigación de fuentes oficiales consultadas 2026-11-12. Los catálogos públicos verifican edición y alcance; no se afirma haber adquirido ni auditado cláusulas completas de estándares de pago. Aplicación orientativa, no certificación.
+Investigación de fuentes oficiales, reabiertas y contrastadas en la auditoría independiente del 2026-11-12. Los catálogos públicos verifican edición y alcance; no se afirma haber adquirido ni auditado cláusulas completas de estándares de pago. Aplicación orientativa, no certificación.
 
 | Referencia | Edición identificada | Aplicación concreta / evidencia |
 |---|---|---|
@@ -31,7 +31,7 @@ Investigación de fuentes oficiales consultadas 2026-11-12. Los catálogos públ
 | Recuperación | Catálogo utilizable tras fallo IA | Inyectar error/timeout y verificar acciones no IA |
 | Internacionalización | ES/EN sin claves crudas ni truncamiento crítico | Fechas, zonas, pluralización, texto largo |
 
-Los valores Web Vitals son objetivos adoptados, no resultados alcanzados. Antes de incluirlos como afirmación externa, cotejar criterios vigentes de [web.dev/vitals](https://web.dev/articles/vitals) y registrar fecha de consulta específica; esta fase no aporta mediciones de campo.
+Los valores Web Vitals son objetivos adoptados, no resultados alcanzados. Se contrastaron con [web.dev/vitals](https://web.dev/articles/vitals) el 2026-11-12: los umbrales se evalúan en el percentil 75, segmentando móvil y escritorio. Esta fase no aporta mediciones de campo; Lighthouse no demuestra ese percentil.
 
 ## 3. Pirámide de pruebas y ambientes
 
@@ -78,3 +78,7 @@ Revisar WCAG: contraste normal 4.5:1 y grande 3:1; no-texto 3:1 cuando correspon
 Reclutar, con consentimiento, cinco participantes de perfiles prioritarios para prueba formativa del MVP (distinta de la exploración propuesta de 8–12); no se han realizado entrevistas. Tareas sin instrucción de navegación: encontrar oportunidad relevante, explicar requisito, guardar y definir siguiente paso. Registrar ayudas, errores, comprensión y percepción de confianza. Evitar inferencias poblacionales. Si no se logra reclutar, reportar solo evaluación experta y riesgo residual.
 
 Salida a demo: Must aprobados, sin bloqueo de seguridad/accesibilidad, catálogo revisado, origen IA verificable, documentación de limitaciones y respaldo de demo. Toda prueba usa registro: fecha UTC, commit, SDK/modelo, dispositivo, navegador, precondición, entrada sintética, esperado, observado, evidencia, responsable y estado. Los fallos permanecen visibles. No marcar «Done» por existir un test que no se ejecutó.
+
+## 8. Alcance de la auditoría documental final
+
+Las ediciones de la tabla inicial se revalidaron en sus páginas oficiales el 2026-11-12; no hubo cambio de edición. Se distingue ciclo de vida (12207), modelo de calidad del producto (25010), diseño centrado en personas (9241-210) y gestión de servicios (20000-1). OWASP es una referencia de concienciación sobre riesgos, no certificación; Scrum Guide describe el marco, no la garantía de que el equipo lo practique. Las pruebas siguen pendientes. La matriz completa requisito → componente → decisión → caso se mantiene en [REQUIREMENTS_TRACEABILITY.md](REQUIREMENTS_TRACEABILITY.md); la tabla anterior es un resumen, no reemplaza esa cobertura.
