@@ -1,0 +1,354 @@
+{
+  "app": {
+    "name": "UMBRAL",
+    "subtitle": "Hybrid AI",
+    "tagline": "De oportunidad verificada a siguiente paso claro",
+    "skipToContent": "Saltar al contenido principal",
+    "offlineBanner": "Modo sin conexión activo: el catálogo verificado, el comparador de requisitos y Mi Ruta siguen funcionando localmente. La IA local de Chrome también opera sin red cuando está lista.",
+    "storageWarning": "El almacenamiento local del navegador está restringido o lleno. Los cambios siguen activos en esta sesión; exporta Mi Ruta antes de salir.",
+    "disclaimerFooter": "UMBRAL Hybrid AI no garantiza becas, empleos, fondos ni elegibilidad oficial. Confirma siempre reglas y fechas en la convocatoria oficial."
+  },
+  "nav": {
+    "primaryLabel": "Navegación principal",
+    "explore": "Explorar",
+    "route": "Mi Ruta",
+    "settings": "Ajustes",
+    "privacy": "Privacidad",
+    "savedBadge": "{{count}} guardadas",
+    "languageToggle": "Cambiar idioma a inglés"
+  },
+  "intro": {
+    "label": "Cargando UMBRAL Hybrid AI",
+    "skip": "Omitir entrada"
+  },
+  "tour": {
+    "dialogLabel": "Guía rápida de 4 pasos",
+    "stepCounter": "Paso {{current}} de {{total}}",
+    "next": "Siguiente",
+    "back": "Anterior",
+    "skip": "Omitir",
+    "finish": "Finalizar",
+    "steps": {
+      "finder": {
+        "title": "1. Encuentra convocatorias reales en 3 clics",
+        "body": "Filtra oportunidades verificadas por país, categoría o modalidad. Cada ficha muestra su fecha de verificación y fuente oficial."
+      },
+      "hybridStatus": {
+        "title": "2. Estado real de IA Híbrida",
+        "body": "Visualiza de inmediato si la IA local de Chrome (Gemini Nano) está lista sin red o cuándo se usará Firebase Cloud AI solo con tu consentimiento."
+      },
+      "detailCard": {
+        "title": "3. Abre cualquier ficha para evaluar y consultar",
+        "body": "Compara tu perfil con 4 estados claros (Coincide, No coincide, Por confirmar, Desconocido) y pide explicaciones contextuales con IA."
+      },
+      "myRouteNav": {
+        "title": "4. Organiza tu avance en Mi Ruta",
+        "body": "Guarda oportunidades en un clic, fija 1 objetivo activo y coordina hasta 3 pasos siguientes almacenados de forma privada en tu dispositivo."
+      }
+    }
+  },
+  "common": {
+    "loading": "Cargando…",
+    "retry": "Reintentar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "save": "Guardar",
+    "saved": "Guardada",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "undo": "Deshacer",
+    "close": "Cerrar",
+    "backToExplore": "Volver a Explorar",
+    "notPublished": "No publicado por la fuente oficial",
+    "yes": "Sí",
+    "no": "No",
+    "unsure": "No estoy seguro"
+  },
+  "status": {
+    "open": "Abierta",
+    "ongoing": "Continua",
+    "upcoming": "Próxima",
+    "closed": "Cerrada",
+    "review_required": "Requiere reverificación",
+    "withdrawn": "Retirada"
+  },
+  "categories": {
+    "all": "Todas las categorías",
+    "employment": "Empleo y prácticas",
+    "education": "Educación y becas",
+    "training": "Formación y cursos",
+    "entrepreneurship": "Emprendimiento y fondos",
+    "civic": "Cívico y público"
+  },
+  "countries": {
+    "all": "Todos los países",
+    "PE": "Perú",
+    "CO": "Colombia",
+    "MX": "México",
+    "ES": "España",
+    "US": "Estados Unidos",
+    "INT": "Internacional",
+    "OTHER": "Otro país"
+  },
+  "modality": {
+    "all": "Cualquier modalidad",
+    "online": "Virtual",
+    "onsite": "Presencial",
+    "hybrid": "Híbrida",
+    "unknown": "Sin especificar"
+  },
+  "explore": {
+    "heroKicker": "Guía verificada + IA Híbrida local y en nube con Firebase",
+    "heroTitle": "Descubre oportunidades reales, comprueba requisitos y organiza tus próximos pasos sin ruido.",
+    "heroDescription": "Cada convocatoria incluye fuente oficial y fecha de verificación. Usa IA local para resúmenes privados o Firebase Cloud AI con tu consentimiento explícito.",
+    "finderHeading": "Buscador rápido en 3 clics",
+    "searchLabel": "Buscar por título, institución o requisito",
+    "searchPlaceholder": "Ej.: beca, ciberseguridad, Python, SENA, PRONABEC…",
+    "countryLabel": "País / Alcance",
+    "categoryLabel": "Categoría",
+    "modalityLabel": "Modalidad",
+    "includeClosed": "Incluir cerradas o por reverificar ({{count}})",
+    "clearFilters": "Limpiar filtros",
+    "resultsCount_one": "{{count}} oportunidad encontrada",
+    "resultsCount_other": "{{count}} oportunidades encontradas",
+    "catalogVerified": "Catálogo curado al {{date}} · Operación local inmediata",
+    "emptyTitle": "Ninguna oportunidad coincide con estos filtros",
+    "emptyBody": "Prueba quitando un filtro, ampliando el país o activando convocatorias cerradas para referencia.",
+    "verifiedLabel": "Verificada",
+    "deadlineLabel": "Plazo / Ventana",
+    "keyConditionLabel": "Condición clave",
+    "openDetail": "Ver requisitos e IA",
+    "saveAction": "Guardar en Mi Ruta",
+    "savedAction": "En Mi Ruta"
+  },
+  "ai": {
+    "badge": {
+      "ON_DEVICE": "Ejecutado en el dispositivo · Chrome Gemini Nano",
+      "IN_CLOUD": "Ejecutado en la nube · Firebase AI ({{model}})",
+      "UNVERIFIED": "Origen no verificado",
+      "localPill": "IA local lista",
+      "downloadPill": "Preparar modelo local",
+      "downloadingPill": "Descargando IA local ({{percent}}%)",
+      "cloudPill": "Firebase Cloud AI listo",
+      "setupPill": "Falta configuración de IA"
+    },
+    "modes": {
+      "PREFER_ON_DEVICE": {
+        "label": "Preferir en dispositivo (Híbrido recomendado)",
+        "description": "Usa Chrome Gemini Nano localmente cuando está disponible; recurre a Firebase Cloud Gemini solo si diste consentimiento."
+      },
+      "ONLY_ON_DEVICE": {
+        "label": "Solo en dispositivo (Cero nube)",
+        "description": "Nunca envía datos a la nube. Bloquea el fallback si el modelo local no está disponible."
+      },
+      "PREFER_IN_CLOUD": {
+        "label": "Preferir en la nube (Respaldo local)",
+        "description": "Usa Firebase Cloud Gemini primero (con consentimiento) y pasa al dispositivo si falla la conexión."
+      },
+      "ONLY_IN_CLOUD": {
+        "label": "Solo en la nube (Firebase AI Logic)",
+        "description": "Ejecuta siempre en Gemini en la nube protegido por Firebase App Check."
+      }
+    },
+    "consent": {
+      "bannerTitle": "Se requiere consentimiento para IA en la nube",
+      "bannerBody": "Para usar inferencia en la nube ({{reason}}), UMBRAL enviará únicamente los fragmentos verificados de esta oportunidad y tu pregunta a Google Firebase AI Logic. Tus tareas privadas o datos personales no se envían.",
+      "fallbackReason": "el modelo local de Chrome figura como «{{availability}}»",
+      "cloudModeReason": "el modo elegido utiliza inferencia en la nube",
+      "grant": "Permitir Firebase Cloud AI en este navegador",
+      "keepLocalOnly": "Mantener solo local (Solo en dispositivo)",
+      "grantedStatus": "Consentimiento nube concedido (revocable en Ajustes)",
+      "notGrantedStatus": "Modo privado por defecto · Nada sale del navegador sin tu permiso"
+    },
+    "panel": {
+      "heading": "Asistente Contextual de IA Híbrida",
+      "subheading": "Traduce requisitos publicados a pasos concretos citando fuentes verificadas. No inventa datos ni decide elegibilidad oficial.",
+      "currentMode": "Modo activo",
+      "focusLabel": "Pregunta o enfoque opcional (sin documentos de identidad)",
+      "focusPlaceholder": "Ej.: ¿Qué constancia conviene verificar antes de empezar?",
+      "explainBtn": "Explicar requisitos",
+      "prepBtn": "Proponer 3 pasos previos",
+      "cancelBtn": "Cancelar consulta IA",
+      "running": "Ejecutando inferencia de IA Híbrida…",
+      "summaryHeading": "Resumen en lenguaje claro",
+      "groundedHeading": "Requisitos y condiciones respaldadas",
+      "suggestedHeading": "Pasos de preparación sugeridos",
+      "unknownsHeading": "Falta confirmar en la fuente oficial",
+      "evidenceTag": "Evidencia: {{ids}}",
+      "noEvidence": "Vista general",
+      "addStepToRoute": "Añadir a Mi Ruta",
+      "addedStepToRoute": "Añadido a Mi Ruta",
+      "stepLimitReached": "Mi Ruta ya tiene 3 pasos activos. Completa o quita uno primero.",
+      "downloadPrompt": "El modelo local de Chrome puede descargarse ahora (requiere Chrome escritorio 139+ y espacio libre suficiente).",
+      "downloadBtn": "Descargar / inicializar modelo local",
+      "downloadProgress": "Descargando Gemini Nano local… {{percent}}%",
+      "followUpHeading": "Seguimiento multi-turno y comparación en nube",
+      "followUpBadge": "Capacidad exclusiva de nube (Firebase AI Logic startChat)",
+      "compareSelectLabel": "Comparar opcionalmente con otra oportunidad verificada",
+      "compareNone": "Sin comparación — analizar solo esta convocatoria",
+      "followUpPlaceholder": "Haz una pregunta de seguimiento o compara ambas oportunidades…",
+      "followUpSend": "Consultar en nube",
+      "followUpSending": "Consultando Firebase Cloud AI…",
+      "latencyMeta": "inferenceSource observado: {{source}} · {{ms}} ms"
+    },
+    "errors": {
+      "FIREBASE_NOT_CONFIGURED": "Faltan variables Firebase en .env ({{details}}). Aun así puedes explorar fichas verificadas, usar el comparador determinista y organizar Mi Ruta sin conexión.",
+      "ON_DEVICE_UNAVAILABLE": "La IA local de Chrome no está disponible en este navegador o equipo ahora ({{details}}). Cambia de modo o autoriza Firebase Cloud AI.",
+      "CLOUD_CONSENT_REQUIRED": "Aún no concediste permiso para la nube. Autoriza el uso de la nube abajo o utiliza Solo en dispositivo si Gemini Nano está listo.",
+      "CLOUD_CONSENT_REQUIRED_FOR_FALLBACK": "El modelo local no está listo y el respaldo silencioso en nube está bloqueado por privacidad. Concede consentimiento o inicializa el modelo local.",
+      "NETWORK_OFFLINE": "Sin conexión a internet para consultar la nube. Vuelve a intentarlo con red o usa Solo en dispositivo cuando Gemini Nano esté listo.",
+      "REQUEST_CANCELLED": "La consulta anterior de IA fue cancelada.",
+      "INVALID_AI_OUTPUT": "La IA devolvió una respuesta mal formada que no pasó la validación de seguridad. Inténtalo de nuevo.",
+      "AI_EXECUTION_FAILED": "Firebase AI Logic no pudo completar la solicitud ({{details}})."
+    }
+  },
+  "detail": {
+    "trustHeader": "Ficha verificable",
+    "officialLinkBtn": "Abrir fuente oficial",
+    "applyLinkBtn": "Ir al portal de postulación",
+    "unsafeUrlWarning": "La URL oficial falta o no cumple verificación HTTPS.",
+    "verifiedOn": "Verificado el {{date}}",
+    "reviewBy": "Revisar antes del {{date}}",
+    "costHeading": "Costo y beneficio",
+    "deadlineHeading": "Plazos y calendario",
+    "instructionsHeading": "Cómo continuar oficialmente",
+    "requirementsHeading": "Requisitos publicados",
+    "conditionsHeading": "Condiciones clave",
+    "unknownsHeading": "No publicado / Verificar directamente",
+    "sourcesHeading": "Fuentes consultadas",
+    "selfCheck": {
+      "heading": "Autocomprobación transparente de requisitos",
+      "disclaimer": "Solo referencia informativa; no es dictamen oficial. Los campos vacíos quedan como Desconocido o Por confirmar.",
+      "clearBtn": "Limpiar perfil",
+      "countryLabel": "País de residencia",
+      "countrySelect": "Selecciona país…",
+      "authLabel": "¿Autorizado legalmente para trabajar/estudiar en el destino?",
+      "educationLabel": "Nivel educativo actual o alcanzado",
+      "educationOptions": {
+        "": "Sin indicar",
+        "primary": "Primaria",
+        "secondary": "Secundaria / Bachillerato",
+        "student_enrolled": "Estudiante matriculado",
+        "technical": "Formación técnica",
+        "bachelor": "Grado / Bachiller universitario",
+        "postgrad": "Maestría / Posgrado"
+      },
+      "experienceLabel": "Experiencia práctica previa",
+      "experienceOptions": {
+        "": "Sin indicar",
+        "none": "Sin experiencia previa",
+        "under_1y": "Menos de 1 año",
+        "1_to_3y": "De 1 a 3 años",
+        "3y_plus": "Más de 3 años"
+      },
+      "modalityLabel": "Modalidad preferida",
+      "languagesLabel": "Idiomas que manejas",
+      "summaryCounts": "{{match}} Coincide · {{mismatch}} No coincide · {{confirm}} Por confirmar · {{unknown}} Desconocido",
+      "badges": {
+        "MATCH": "Coincide",
+        "MISMATCH": "No coincide",
+        "NEEDS_CONFIRMATION": "Por confirmar",
+        "UNKNOWN": "Desconocido"
+      }
+    }
+  },
+  "route": {
+    "heading": "Mi Ruta",
+    "subheading": "Mantén el foco con 1 objetivo activo, hasta 3 pasos próximos y tus oportunidades guardadas en este dispositivo.",
+    "goalHeading": "Objetivo activo (máximo 1)",
+    "goalInputLabel": "Descripción de tu objetivo",
+    "goalPlaceholder": "Ej.: Reunir constancias y redactar ensayo antes del 15 de diciembre",
+    "goalSetBtn": "Guardar objetivo",
+    "goalClearBtn": "Quitar objetivo",
+    "goalConfirmReplaceTitle": "¿Reemplazar tu objetivo actual?",
+    "goalConfirmReplaceBody": "Ya tienes un objetivo activo: «{{current}}». ¿Reemplazarlo por «{{next}}»?",
+    "goalReplaceBtn": "Sí, reemplazar",
+    "goalChars": "{{count}}/{{max}} caracteres",
+    "tasksHeading": "Próximos pasos ({{active}}/3 activos)",
+    "taskPlaceholder": "Escribe un paso concreto (máximo 200 caracteres)…",
+    "taskDateLabel": "Fecha personal opcional",
+    "taskAddBtn": "Añadir paso",
+    "taskLimitNote": "Límite de foco alcanzado (3 pasos activos). Completa o elimina uno antes de sumar otro.",
+    "taskEmptyTitle": "Aún no tienes pasos añadidos",
+    "taskEmptyBody": "Anota hasta 3 pasos concretos o pídele a la IA Híbrida sugerencias desde cualquier oportunidad.",
+    "taskMoveUp": "Subir",
+    "taskMoveDown": "Bajar",
+    "taskStatuses": {
+      "pending": "Pendiente",
+      "in_progress": "En curso",
+      "completed": "Completado"
+    },
+    "savedHeading": "Oportunidades guardadas ({{count}})",
+    "savedEmptyTitle": "Sin oportunidades guardadas",
+    "savedEmptyBody": "Explora oportunidades verificadas y guarda las que quieras seguir en tu ruta.",
+    "savedGoExplore": "Explorar catálogo",
+    "savedRemovedUndo": "Se quitó «{{title}}» de Mi Ruta.",
+    "trackingStatuses": {
+      "saved": "Guardada",
+      "preparing": "Preparando",
+      "applied_self_reported": "Postulada (autorreporte)",
+      "closed": "Cerrada"
+    },
+    "exportHeading": "Respaldo portable",
+    "exportMarkdown": "Descargar Markdown (.md)",
+    "exportJson": "Descargar JSON (.json)",
+    "exportedNotice": "Se descargó el respaldo en formato {{format}}."
+  },
+  "settings": {
+    "heading": "Ajustes y Diagnóstico de IA Híbrida",
+    "subheading": "Gestiona idioma, consentimiento nube, preferencia de Firebase AI y datos locales del navegador.",
+    "languageSection": "Idioma de la aplicación",
+    "languageHint": "Afecta la interfaz, el comparador determinista, los prompts de IA y las fichas bilingües.",
+    "hybridSection": "Preferencia de inferencia híbrida",
+    "consentToggle": "Permitir consultas en nube con Firebase AI cuando las solicite o falte modelo local",
+    "diagnosticsSection": "Diagnóstico real del navegador y Firebase",
+    "diagBrowser": "Navegador detectado",
+    "diagPromptApi": "Chrome Prompt API (window.LanguageModel)",
+    "diagLocalModel": "Estado de Gemini Nano local",
+    "diagFirebaseSdk": "Configuración Firebase Web App",
+    "diagAppCheck": "Firebase App Check",
+    "diagCloudModel": "Modelo Gemini configurado en nube",
+    "diagRefresh": "Volver a comprobar",
+    "yesSupported": "Compatible",
+    "noUnsupported": "No disponible en este navegador",
+    "configured": "Configurado",
+    "notConfigured": "Faltan variables de entorno",
+    "appCheckModes": {
+      "recaptcha_enterprise": "reCAPTCHA Enterprise (tokens limitados de IA)",
+      "debug": "Modo token de depuración local",
+      "unconfigured": "No configurado"
+    },
+    "localAvailabilityLabels": {
+      "available": "Listo en el dispositivo",
+      "downloadable": "Descargable con clic del usuario",
+      "downloading": "Descargando actualmente…",
+      "unavailable": "No disponible en este equipo o disco",
+      "unsupported": "Navegador no compatible"
+    },
+    "auditSection": "Registro de ejecuciones IA en esta sesión (sin PII)",
+    "auditEmpty": "Todavía no se ejecutó ninguna operación de IA en esta sesión.",
+    "auditClear": "Limpiar registro",
+    "experienceSection": "Animación inicial y guía",
+    "replayIntro": "Repetir animación inicial",
+    "replayTour": "Repetir guía visual de 4 pasos",
+    "dangerSection": "Control de datos locales",
+    "clearDataBtn": "Borrar todos mis datos locales",
+    "clearDataConfirmTitle": "¿Eliminar objetivos, pasos, oportunidades guardadas y autocomprobación?",
+    "clearDataConfirmBtn": "Sí, borrar todo",
+    "dataClearedNotice": "Todos los datos locales fueron eliminados."
+  },
+  "privacy": {
+    "heading": "Privacidad, Transparencia y Límites de IA",
+    "intro": "UMBRAL Hybrid AI opera primero en tu dispositivo. Nunca pide registro, DNI, pasaporte, ingresos ni información médica.",
+    "cards": {
+      "localFirstTitle": "1. Todo lo tuyo permanece en tu navegador",
+      "localFirstBody": "Tu objetivo activo, hasta 3 pasos, oportunidades guardadas, perfil de autocomprobación y consentimiento viven exclusivamente en localStorage hasta que decidas exportarlos o borrarlos.",
+      "onDeviceTitle": "2. IA privada en el dispositivo (Chrome Gemini Nano)",
+      "onDeviceBody": "En Chrome escritorio 139+ con Gemini Nano descargado, las explicaciones y planes de un turno se procesan localmente sin enviar datos fuera de tu equipo.",
+      "cloudBoundaryTitle": "3. Consentimiento explícito en la nube y App Check",
+      "cloudBoundaryBody": "Firebase Cloud AI (Gemini Developer API) solo se activa si concedes permiso expreso —o en comparaciones multi-turno en nube— protegido con tokens de un solo uso de App Check. Solo se envía la ficha verificada y tu consulta.",
+      "honestyTitle": "4. Sin falsa elegibilidad ni datos inventados",
+      "honestyBody": "UMBRAL muestra fechas reales de verificación, marca campos ausentes con claridad, nunca sustituye decisiones oficiales y reporta el inferenceSource exacto entregado por el SDK de Firebase."
+    }
+  }
+}

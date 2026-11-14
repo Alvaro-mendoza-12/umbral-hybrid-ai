@@ -1,0 +1,66 @@
+:root {
+  /* Civic-Editorial Surface & Ink Palette */
+  --bg-canvas: #f6f7f5;
+  --bg-paper: #ffffff;
+  --bg-subtle: #edf1ee;
+  --bg-elevated: #ffffff;
+
+  --ink-primary: #13201b;
+  --ink-secondary: #374841;
+  --ink-muted: #51625b;
+
+  /* Threshold Emerald & Civic Highlight */
+  --brand-primary: #0f4c3a;
+  --brand-primary-hover: #0a382a;
+  --brand-on-primary: #ffffff;
+  --brand-soft: #e4f0ea;
+  --brand-accent: #d9ed6f;
+
+  /* Accessible Focus & Borders */
+  --focus-ring: #1d4ed8;
+  --border-subtle: #d5ded9;
+  --border-strong: #9fb0a8;
+
+  /* Semantic Status Colors (never used without label/icon) */
+  --status-good-bg: #e6f4ec;
+  --status-good-fg: #0d5434;
+  --status-good-border: #9fd4b8;
+
+  --status-info-bg: #e8f1fb;
+  --status-info-fg: #14437a;
+  --status-info-border: #a8c8ee;
+
+  --status-warn-bg: #fdf4db;
+  --status-warn-fg: #754c00;
+  --status-warn-border: #e5c16c;
+
+  --status-bad-bg: #fdecec;
+  --status-bad-fg: #8e1b1b;
+  --status-bad-border: #e8aaaa;
+
+  --status-neutral-bg: #eef1ef;
+  --status-neutral-fg: #3b4a44;
+  --status-neutral-border: #c4cec9;
+
+  --cloud-bg: #ebf0ff;
+  --cloud-fg: #1e3a8a;
+  --cloud-border: #b3c4fa;
+
+  /* Typography */
+  --font-sans: 'Segoe UI Variable', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Mono', 'Segoe UI Mono', Consolas, monospace;
+
+  /* Scale & Radii */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+
+  --shadow-sm: 0 1px 2px rgba(19, 32, 27, 0.06);
+  --shadow-md: 0 8px 24px rgba(19, 32, 27, 0.08);
+  --shadow-lg: 0 18px 42px rgba(19, 32, 27, 0.16);
+
+  --container-max: 1120px;
+  --header-height: 64px;
+  --mobile-nav-height: 68px;
+}

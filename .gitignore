@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+dist-ssr/
+*.local
+*.tsbuildinfo
+
+# Environment & secrets (never commit local tokens or project keys)
+.env
+.env.local
+.env.*.local
+
+# Test & coverage artifacts
+coverage/
+playwright-report/
+test-results/
+blob-report/
+
+# Firebase & Vercel local state
+.firebase/
+.vercel/
+firebase-debug.log
+firebase-debug.*.log
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+*.log
