@@ -1,26 +1,46 @@
-# UMBRAL Hybrid AI — descubrimiento de producto
+# UMBRAL Hybrid AI
 
-> Documentación de diseño y planificación. No es una aplicación implementada, una candidatura enviada ni una afirmación de conformidad con el concurso. Consulta de fuentes: 12 de noviembre de 2026, salvo indicación distinta.
+[English](README.md) · [Atribución de trabajo previo](docs/PRIOR_WORK_AND_ATTRIBUTION.md) · [Evidencia de pruebas](docs/TESTING_EVIDENCE.md) · [Borrador Devpost](docs/DEVPOST_SUBMISSION.md)
 
-UMBRAL Hybrid AI propone ayudar a las personas a encontrar oportunidades, entender sus requisitos y organizar próximos pasos sin convertir la experiencia en un chatbot genérico. El MVP recomendado es web responsive, con catálogo pequeño y curado, fuentes enlazadas, Mi Ruta local y asistencia contextual mediante Firebase AI Logic sujeta a una prueba técnica previa.
+**UMBRAL Hybrid AI** es una aplicación web bilingüe (español / inglés), accesible y centrada en la privacidad, construida para la hackathon oficial **#BuildHybridAI 2026** de Google Firebase. Ayuda a estudiantes, personas en búsqueda de empleo y emprendedores a descubrir oportunidades verificadas (becas, empleo, formación y financiamiento), comprobar sus requisitos de forma determinista, organizar sus próximos pasos en **Mi Ruta** y recibir ayuda contextual mediante **Firebase AI Logic Hybrid Inference**.
 
-[English](README.md) · [Visión](docs/PRODUCT_VISION.md) · [Requisitos funcionales](docs/FUNCTIONAL_REQUIREMENTS.md) · [Arquitectura IA](docs/HYBRID_AI_ARCHITECTURE.md) · [Concurso](docs/HACKATHON_COMPLIANCE.md) · [Plan](docs/SCRUM_BACKLOG_AND_ROADMAP.md)
+> **Preservación de candidatura previa:** El repositorio original de Kiroween 2026 ([Alvaro-mendoza-12/Umbral](https://github.com/Alvaro-mendoza-12/Umbral) / [umbral-seven-khaki.vercel.app](https://umbral-seven-khaki.vercel.app)) permanece completamente intacto. Toda esta versión nueva se desarrolló de forma exclusiva en la rama `feat/hybrid-ai-web`. Consulta [docs/PRIOR_WORK_AND_ATTRIBUTION.md](docs/PRIOR_WORK_AND_ATTRIBUTION.md).
 
-## Lectura sugerida
+---
 
-1. Producto y evidencia: visión, investigación de mercado, personas y recorridos.
-2. Alcance: requisitos funcionales y no funcionales, arquitectura de información.
-3. Experiencia: sistema visual, animación y guía inicial.
-4. Tecnología: IA híbrida, seguridad Firebase y arquitectura de software.
-5. Entrega: calidad, backlog, concurso, riesgos, decisiones y encargo para Codex.
-6. Revisión: [matriz de trazabilidad](docs/REQUIREMENTS_TRACEABILITY.md) y [auditoría final](docs/FINAL_DISCOVERY_AUDIT.md).
+## Capacidades principales
 
-## Límites y transparencia
+1. **Descubrimiento rápido y fuentes verificables (`/`)**:
+   - Catálogo curado de 20 oportunidades (`CURATED_CATALOG_VERSION = 2026.11.14-r1`) en `INT`, `PE`, `CO`, `MX`, `ES` y `US`, con enlaces HTTPS oficiales, fechas límite con zona horaria, fecha de verificación (`verifiedAt`) y fecha sugerida de revisión (`reviewBy`).
+   - Filtros inmediatos por país, categoría, modalidad, ventana de cierre, idioma y texto libre en tres clics o menos.
+2. **Autocomprobación determinista en 4 estados (`/opportunities/:id`)**:
+   - Compara el perfil ingresado con los requisitos de la convocatoria sin emitir decisiones oficiales de elegibilidad.
+   - Separa `MATCHES`, `DOES_NOT_MATCH`, `NEEDS_CONFIRMATION` y `UNKNOWN` de forma determinista en TypeScript puro (`src/domain/matcher.ts`), sin depender de modelos de IA.
+3. **IA Híbrida real con Firebase AI Logic (`src/adapters/firebase/`)**:
+   - Integración directa con `firebase/ai` (`firebase@^13.3.0`) usando `GoogleAIBackend`, `useLimitedUseAppCheckTokens: true` y Firebase App Check (`ReCaptchaEnterpriseProvider` en producción y token de depuración configurable solo fuera de producción).
+   - Soporta los cuatro modos (`PREFER_ON_DEVICE`, `ONLY_ON_DEVICE`, `PREFER_IN_CLOUD`, `ONLY_IN_CLOUD`), descarga explícita bajo acción del usuario (`initializeDeviceModel`), salidas JSON estructuradas (`Schema.object` en nube y `responseConstraint` en Chrome local) y chat/comparación multi-turno en la nube (`startChat` con `ONLY_IN_CLOUD`).
+   - **Puerta de consentimiento previo (`src/services/aiOrchestrator.ts`)**: bloquea cualquier fallback silencioso a la nube si el usuario no otorgó consentimiento explícito. La procedencia (`ON_DEVICE`, `IN_CLOUD` o `UNVERIFIED`) se lee directamente de `result.response.inferenceSource`.
+4. **Mi Ruta local (`/route`)**:
+   - Persistencia local (`localStorage` con claves `umbral:route:v2`, `umbral:profile:v1`, `umbral:prefs:v1`) limitada a 1 meta activa y hasta 3 pasos activos para evitar saturación cognitiva, más exportación/importación JSON y borrado completo en un clic.
+5. **UX accesible y diseño centrado en las personas (`src/app/`, `src/styles/`)**:
+   - Animación inicial breve hacia la esquina superior izquierda (`IntroSplash`, respeta `prefers-reduced-motion`).
+   - Guía interactiva no modal de 4 pasos (`OnboardingTour`) operable por teclado y lectores de pantalla, con persistencia de finalización.
+   - Diseño responsive mobile-first verificado en 7 anchos (`320px` a `1440px`), reflow al 200%, navegación completa con teclado y auditorías Axe WCAG 2.2 AA.
 
-Las personas y metas son hipótesis de diseño, no entrevistas. Las oportunidades deben verificarse y fecharse contra fuentes oficiales antes de presentarlas como reales. Las capacidades y rutas locales dependen de navegador, dispositivo, modelo, SDK y disponibilidad; pedir una ruta no demuestra dónde se ejecutó. La documentación no sustituye pruebas en dispositivos reales. Las reglas completas y elegibilidad deben comprobarse antes de enviar. No hay credenciales ni proyectos Firebase en esta fase.
+---
 
-El original se consultó en modo lectura; no se ha copiado indiscriminadamente. Ver registro de decisiones y fuentes en los documentos. Nada de esto autoriza una implementación, despliegue o presentación de candidatura.
+## Instalación y comandos locales
 
-## Repositorio y estado de esta entrega
+Requisitos: Node.js `>=20.19.0` y Google Chrome Desktop `>=139` para inspeccionar `window.LanguageModel`.
 
-Destino previsto: [Alvaro-mendoza-12/umbral-hybrid-ai](https://github.com/Alvaro-mendoza-12/umbral-hybrid-ai), rama `docs/product-discovery`. Al momento de preparar estos archivos el repositorio remoto estaba vacío y el acceso Git disponible no permitía autenticar el primer push; por ello la publicación no debe darse por realizada hasta verificar la rama remota. La copia local y cualquier paquete entregado son documentación pendiente de publicación, no evidencia de un commit remoto.
+```bash
+npm install
+npm run dev          # Servidor de desarrollo Vite
+npm run typecheck    # Comprobación estricta TypeScript
+npm run lint         # Reglas ESLint 10
+npm run test         # Pruebas unitarias e integración (Vitest)
+npm run build        # Compilación de producción + PWA
+npm run test:e2e     # Build + Playwright E2E + Axe WCAG 2.2 AA
+```
+
+Para habilitar llamadas reales contra Firebase AI Logic y Gemini en la nube, copia [.env.example](.env.example) a `.env.local` y completa tus claves públicas de Firebase Web App, la clave de sitio reCAPTCHA Enterprise y `VITE_FIREBASE_AI_CLOUD_MODEL=gemini-3.5-flash-lite`. Sin esas credenciales la aplicación funciona íntegramente en modo local/curado (catálogo, autocomprobación, Mi Ruta y diagnósticos), y muestra con claridad en Configuración (`/settings`) qué variables faltan.
