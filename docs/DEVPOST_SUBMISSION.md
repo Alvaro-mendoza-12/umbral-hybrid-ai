@@ -1,6 +1,6 @@
 # Devpost Submission Package — UMBRAL Hybrid AI (`#BuildHybridAI 2026`)
 
-> **Important Pre-Submission Note for the Team:** Several pre-submission items must be completed before submitting this copy to Devpost (`2026-11-30 2:00 PM PST`): (1) commit and push the local Release Candidate changes on `feat/hybrid-ai-web` to `Alvaro-mendoza-12/umbral-hybrid-ai`, (2) fix `LICENSE` so GitHub detects `Apache-2.0` instead of `NOASSERTION`, (3) redeploy `https://umbral-21e8b.web.app` and `https://umbral-hybrid-ai.vercel.app` so production serves the hardened build with `useLimitedUseAppCheckTokens: true`, and (4) capture real `ON_DEVICE` (`result.response.inferenceSource === 'ON_DEVICE'`) demo footage and record/upload the `<= 3 min` public YouTube video on hardware meeting Chrome 157's GPU VRAM (`>= 3000 MiB` detected free VRAM) and disk (`>= 20 GiB` free on Chrome profile + `TEMP` drive) requirements. See [BUILDHYBRIDAI_RELEASE_READINESS.md](./BUILDHYBRIDAI_RELEASE_READINESS.md).
+> **Important Pre-Submission Note for the Team:** All repository, `Apache-2.0` license, security hardening (`useLimitedUseAppCheckTokens: true`), and live production deployment items (`https://umbral-21e8b.web.app` and `https://umbral-hybrid-ai.vercel.app`) on `feat/hybrid-ai-web` are completed and verified. Before clicking **Submit** on Devpost (`2026-11-30 2:00 PM PST`), complete the remaining hardware/media step: capture real offline `ON_DEVICE` (`result.response.inferenceSource === 'ON_DEVICE'`) demo footage/screenshot and record/upload the `<= 3 min` public YouTube video on a machine meeting Chrome 157's GPU VRAM (`>= 3000 MiB` detected free VRAM, e.g., `>= 6–8 GB` GPU or Apple Silicon `>= 16 GB`) and disk (`>= 25 GB` free on Chrome profile + `TEMP` drive) requirements. See [BUILDHYBRIDAI_RELEASE_READINESS.md](./BUILDHYBRIDAI_RELEASE_READINESS.md).
 
 ---
 
@@ -99,7 +99,7 @@ FirebaseAIHybridAdapter (src/adapters/firebase/hybridAiAdapter.ts)
 ### Accomplishments We're Proud Of
 - **Zero-trust hybrid consent architecture** verified end-to-end with zero cloud payload leakage when local-only or unconsented.
 - **Deterministic clarity before AI:** Every eligibility check stays transparent and auditable, never letting an LLM hallucinate approval odds or unpublished fees.
-- **Dual-host CSP-hardened Firebase AI Logic deployment** operating live with `App Check (reCAPTCHA Enterprise)` and verified `IN_CLOUD` inference on both Firebase Hosting (`umbral-21e8b.web.app`) and Vercel (`umbral-hybrid-ai.vercel.app`) — pending only our final RC build push so production matches the local `useLimitedUseAppCheckTokens: true` bundle.
+- **Dual-host CSP-hardened Firebase AI Logic deployment** operating live on both Firebase Hosting (`umbral-21e8b.web.app`) and Vercel (`umbral-hybrid-ai.vercel.app`) with `App Check (reCAPTCHA Enterprise)`, `useLimitedUseAppCheckTokens: true`, and verified `IN_CLOUD` inference (`HTTP 200 OK`).
 - **Comprehensive quality bar:** Unit tests, React integration tests, `axe-core` accessibility verification, offline PWA persistence tests, and visual multi-viewport verification across `390px` mobile and `1280px` desktop.
 
 ---
