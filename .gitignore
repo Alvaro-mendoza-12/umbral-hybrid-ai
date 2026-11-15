@@ -20,6 +20,7 @@ blob-report/
 
 # Firebase & Vercel local state
 .firebase/
+.firebaserc
 .vercel/
 firebase-debug.log
 firebase-debug.*.log
@@ -28,3 +29,5 @@ firebase-debug.*.log
 .DS_Store
 Thumbs.db
 *.log
+
+.vercel

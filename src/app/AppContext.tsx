@@ -19,6 +19,7 @@ import {
   clearActiveGoal,
   emptyMyRouteState,
   moveRouteTask,
+  parseAndValidateRouteImport,
   removeRouteTask,
   removeSavedOpportunity,
   saveOpportunityToRoute,
@@ -98,16 +99,17 @@ export function AppProvider({
   const [capabilitiesLoading, setCapabilitiesLoading] = useState<boolean>(false);
   const [isDownloadingModel, setIsDownloadingModel] = useState<boolean>(false);
   const [downloadProgress, setDownloadProgress] = useState<number | null>(null);
+  const [downloadError, setDownloadError] = useState<{ code: string; details: string } | null>(
+    null,
+  );
   const [aiLog, setAiLog] = useState<AIExecutionLogEntry[]>([]);
 
   const [introActive, setIntroActive] = useState<boolean>(
     () => !initialPrefsResult.value.introVersionSeen && !prefersReducedMotion(),
   );
-  const [tourActive, setTourActive] = useState<boolean>(
-    () =>
-      (Boolean(initialPrefsResult.value.introVersionSeen) || prefersReducedMotion()) &&
-      initialPrefsResult.value.tourStatus === 'never',
-  );
+  // The guided tour is on demand only ("How it works"): it never opens by itself,
+  // so it can't cover the primary actions on a first visit (UX audit H-10).
+  const [tourActive, setTourActive] = useState<boolean>(false);
 
   const localeRef = useRef<Locale>(initialPrefsResult.value.locale);
 
@@ -152,6 +154,8 @@ export function AppProvider({
     try {
       const report = await aiOrchestrator.inspectCapabilities(localeRef.current);
       setCapabilities(report);
+    } catch {
+      // Preserve last known capability state without leaking an unhandled rejection
     } finally {
       setCapabilitiesLoading(false);
     }
@@ -160,11 +164,14 @@ export function AppProvider({
   useEffect(() => {
     if (skipInitialCapabilityProbe) return;
     let active = true;
-    void aiOrchestrator.inspectCapabilities(preferences.locale).then((report) => {
-      if (active) {
-        setCapabilities(report);
-      }
-    });
+    void aiOrchestrator
+      .inspectCapabilities(preferences.locale)
+      .then((report) => {
+        if (active) {
+          setCapabilities(report);
+        }
+      })
+      .catch(() => undefined);
     return () => {
       active = false;
     };
@@ -327,6 +334,17 @@ export function AppProvider({
     [persistRouteState, route],
   );
 
+  const importRouteJson = useCallback(
+    (rawJson: string) => {
+      const parsed = parseAndValidateRouteImport(rawJson);
+      if (parsed.ok) {
+        persistRouteState(parsed.state);
+      }
+      return parsed;
+    },
+    [persistRouteState],
+  );
+
   const updateProfile = useCallback(
     (next: SelfCheckProfile) => {
       const res = resolvedPorts.route.saveProfile(next);
@@ -358,17 +376,32 @@ export function AppProvider({
   const initializeOnDeviceModel = useCallback(async () => {
     setIsDownloadingModel(true);
     setDownloadProgress(0);
+    setDownloadError(null);
     try {
       await aiOrchestrator.initializeOnDeviceModel((ratio) => {
         setDownloadProgress(ratio);
       }, localeRef.current);
       const refreshed = await aiOrchestrator.inspectCapabilities(localeRef.current);
       setCapabilities(refreshed);
+    } catch (err) {
+      const details = err instanceof Error ? err.message : 'Unable to initialize local model.';
+      const code =
+        err &&
+        typeof err === 'object' &&
+        'code' in err &&
+        typeof (err as { code?: unknown }).code === 'string'
+          ? (err as { code: string }).code
+          : 'AI_EXECUTION_FAILED';
+      setDownloadError({ code, details });
     } finally {
       setIsDownloadingModel(false);
       setDownloadProgress(null);
     }
   }, [aiOrchestrator]);
+
+  const clearDownloadError = useCallback(() => {
+    setDownloadError(null);
+  }, []);
 
   const clearAiLog = useCallback(() => {
     setAiLog([]);
@@ -380,10 +413,7 @@ export function AppProvider({
       ...prev,
       introVersionSeen: CURRENT_INTRO_VERSION,
     }));
-    if (preferences.tourStatus === 'never') {
-      setTourActive(true);
-    }
-  }, [persistPrefs, preferences.tourStatus]);
+  }, [persistPrefs]);
 
   const replayIntro = useCallback(() => {
     if (prefersReducedMotion()) {
@@ -430,6 +460,7 @@ export function AppProvider({
       changeSavedStatus,
       unsaveOpportunity,
       restoreSavedOpportunity,
+      importRouteJson,
       profile,
       updateProfile,
       resetProfile,
@@ -439,6 +470,8 @@ export function AppProvider({
       refreshCapabilities,
       isDownloadingModel,
       downloadProgress,
+      downloadError,
+      clearDownloadError,
       initializeOnDeviceModel,
       aiLog,
       clearAiLog,
@@ -462,12 +495,15 @@ export function AppProvider({
       changeTaskStatus,
       clearAiLog,
       clearAllData,
+      clearDownloadError,
       clearGoal,
       closeTour,
       deleteTask,
       dismissIntro,
+      downloadError,
       downloadProgress,
       editTaskText,
+      importRouteJson,
       initializeOnDeviceModel,
       introActive,
       isDownloadingModel,

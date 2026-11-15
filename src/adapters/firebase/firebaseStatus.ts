@@ -2,6 +2,7 @@ export const DEFAULT_CLOUD_MODEL_ID = 'gemini-3.5-flash-lite';
 
 export interface FirebaseRuntimeStatus {
   firebaseConfigured: boolean;
+  firebaseProjectId?: string;
   appCheckConfigured: boolean;
   appCheckMode: 'recaptcha_enterprise' | 'debug' | 'unconfigured';
   cloudModelId: string;
@@ -35,7 +36,9 @@ export function getFirebaseRuntimeStatus(): FirebaseRuntimeStatus {
   const projectId = cleanEnvValue(import.meta.env.VITE_FIREBASE_PROJECT_ID);
   const appId = cleanEnvValue(import.meta.env.VITE_FIREBASE_APP_ID);
   const siteKey = cleanEnvValue(import.meta.env.VITE_RECAPTCHA_ENTERPRISE_SITE_KEY);
-  const debugToken = cleanEnvValue(import.meta.env.VITE_APP_CHECK_DEBUG_TOKEN);
+  const debugToken = import.meta.env.PROD
+    ? ''
+    : cleanEnvValue(import.meta.env.VITE_APP_CHECK_DEBUG_TOKEN);
   const cloudModelId =
     cleanEnvValue(import.meta.env.VITE_FIREBASE_AI_CLOUD_MODEL) || DEFAULT_CLOUD_MODEL_ID;
 
@@ -47,14 +50,15 @@ export function getFirebaseRuntimeStatus(): FirebaseRuntimeStatus {
   const firebaseConfigured = missingVars.length === 0;
   let appCheckMode: FirebaseRuntimeStatus['appCheckMode'] = 'unconfigured';
 
-  if (firebaseConfigured && siteKey) {
-    appCheckMode = 'recaptcha_enterprise';
-  } else if (firebaseConfigured && !import.meta.env.PROD && debugToken) {
+  if (firebaseConfigured && !import.meta.env.PROD && debugToken) {
     appCheckMode = 'debug';
+  } else if (firebaseConfigured && siteKey) {
+    appCheckMode = 'recaptcha_enterprise';
   }
 
   return {
     firebaseConfigured,
+    firebaseProjectId: firebaseConfigured ? projectId : undefined,
     appCheckConfigured: appCheckMode !== 'unconfigured',
     appCheckMode,
     cloudModelId,
@@ -72,6 +76,8 @@ export function readFirebasePublicConfig(): FirebasePublicConfig {
       cleanEnvValue(import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID) || undefined,
     appId: cleanEnvValue(import.meta.env.VITE_FIREBASE_APP_ID),
     siteKey: cleanEnvValue(import.meta.env.VITE_RECAPTCHA_ENTERPRISE_SITE_KEY),
-    debugToken: cleanEnvValue(import.meta.env.VITE_APP_CHECK_DEBUG_TOKEN),
+    debugToken: import.meta.env.PROD
+      ? ''
+      : cleanEnvValue(import.meta.env.VITE_APP_CHECK_DEBUG_TOKEN),
   };
 }

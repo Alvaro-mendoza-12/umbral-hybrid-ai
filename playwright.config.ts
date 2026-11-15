@@ -21,9 +21,18 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run preview',
+    command: 'npm run build:e2e && npm run preview -- --outDir dist-e2e.local',
+    // E2E exercises the app without live credentials or attestation on localhost.
+    // Keep this build separate from the production artifact in dist/.
+    env: {
+      VITE_FIREBASE_API_KEY: '',
+      VITE_FIREBASE_PROJECT_ID: '',
+      VITE_FIREBASE_APP_ID: '',
+      VITE_RECAPTCHA_ENTERPRISE_SITE_KEY: '',
+      VITE_APP_CHECK_DEBUG_TOKEN: '',
+    },
     url: 'http://127.0.0.1:4173',
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
     timeout: 120000,
   },
 });

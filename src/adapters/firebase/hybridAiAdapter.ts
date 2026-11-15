@@ -34,7 +34,9 @@ import { getFirebaseRuntimeStatus } from './firebaseStatus';
 export type AIAdapterErrorCode =
   | 'FIREBASE_NOT_CONFIGURED'
   | 'ON_DEVICE_UNAVAILABLE'
+  | 'APP_CHECK_FAILED'
   | 'REQUEST_CANCELLED'
+  | 'REQUEST_TIMEOUT'
   | 'NETWORK_OFFLINE'
   | 'AI_SAFETY_OR_QUOTA'
   | 'INVALID_AI_OUTPUT'
@@ -130,7 +132,19 @@ function buildExpectedLanguages(
   return [{ type: 'text', languages: langs }];
 }
 
-function mapAdapterError(
+export function cleanAdapterErrorMessage(raw: string): string {
+  const cleaned = raw
+    .replace(/^AI:\s*/i, '')
+    .replace(/Error fetching from https?:\/\/\S+\s*/gi, '')
+    .replace(/https?:\/\/\S+/gi, '')
+    .replace(/FirebaseError:\s*/gi, '')
+    .replace(/\s*\(AI\/[a-z_-]+\)\.?$/i, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return cleaned || raw.trim();
+}
+
+export function mapAdapterError(
   sdk: FirebaseAiSdk | null,
   err: unknown,
   mode: HybridInferencePreference,
@@ -141,7 +155,14 @@ function mapAdapterError(
     return new AIAdapterError('REQUEST_CANCELLED', 'AI request was cancelled.');
   }
 
+  if (err instanceof DOMException && err.name === 'TimeoutError') {
+    return new AIAdapterError('REQUEST_TIMEOUT', 'AI request timed out.');
+  }
+
   if (err instanceof Error) {
+    if (err.name === 'TimeoutError' || /timed out/i.test(err.message)) {
+      return new AIAdapterError('REQUEST_TIMEOUT', 'AI request timed out.', err);
+    }
     if (err.message.startsWith('INVALID_AI_OUTPUT')) {
       return new AIAdapterError(
         'INVALID_AI_OUTPUT',
@@ -155,17 +176,27 @@ function mapAdapterError(
   }
 
   if (sdk && err instanceof sdk.AIError) {
-    if (
+    const cleanedMessage = cleanAdapterErrorMessage(err.message);
+    if (/appcheck|app-check|recaptcha/i.test(err.message)) {
+      return new AIAdapterError('APP_CHECK_FAILED', cleanedMessage, err);
+    }
+    const isLocalModelError =
+      mode === 'ONLY_ON_DEVICE' ||
       err.code === sdk.AIErrorCode.UNSUPPORTED ||
-      err.code === sdk.AIErrorCode.API_NOT_ENABLED ||
-      mode === 'ONLY_ON_DEVICE'
-    ) {
-      return new AIAdapterError('ON_DEVICE_UNAVAILABLE', err.message, err);
+      (err.code === sdk.AIErrorCode.API_NOT_ENABLED &&
+        /LanguageModel|on-device|local/i.test(err.message));
+    if (isLocalModelError) {
+      return new AIAdapterError('ON_DEVICE_UNAVAILABLE', cleanedMessage, err);
     }
     if (err.code === sdk.AIErrorCode.FETCH_ERROR && !isNavigatorOnline()) {
-      return new AIAdapterError('NETWORK_OFFLINE', err.message, err);
+      return new AIAdapterError('NETWORK_OFFLINE', cleanedMessage, err);
     }
-    return new AIAdapterError('AI_EXECUTION_FAILED', err.message, err);
+    if (
+      /429|RESOURCE_EXHAUSTED|quota|rate limit|safety|blocked/i.test(err.message)
+    ) {
+      return new AIAdapterError('AI_SAFETY_OR_QUOTA', cleanedMessage, err);
+    }
+    return new AIAdapterError('AI_EXECUTION_FAILED', cleanedMessage, err);
   }
 
   if (!isNavigatorOnline() && mode !== 'ONLY_ON_DEVICE') {
@@ -176,9 +207,97 @@ function mapAdapterError(
     );
   }
 
-  const message =
+  const rawMessage =
     err instanceof Error ? err.message : 'Unexpected Firebase AI execution error.';
-  return new AIAdapterError('AI_EXECUTION_FAILED', message, err);
+  const cleanedMessage = cleanAdapterErrorMessage(rawMessage);
+  if (/appcheck|app-check|recaptcha/i.test(rawMessage)) {
+    return new AIAdapterError('APP_CHECK_FAILED', cleanedMessage, err);
+  }
+  if (/429|RESOURCE_EXHAUSTED|quota|rate limit/i.test(rawMessage)) {
+    return new AIAdapterError('AI_SAFETY_OR_QUOTA', cleanedMessage, err);
+  }
+  return new AIAdapterError('AI_EXECUTION_FAILED', cleanedMessage, err);
+}
+
+export function isTransientAppCheckError(err: unknown): boolean {
+  if (err instanceof DOMException && (err.name === 'AbortError' || err.name === 'TimeoutError')) {
+    return false;
+  }
+  if (err instanceof Error && (err.name === 'AbortError' || err.name === 'TimeoutError')) {
+    return false;
+  }
+  const rawMessage =
+    err instanceof Error ? err.message : typeof err === 'string' ? err : '';
+  if (!rawMessage) {
+    return false;
+  }
+  if (
+    /429|RESOURCE_EXHAUSTED|INVALID_AI_OUTPUT|timed out|quota|rate limit|safety|blocked|PERMISSION_DENIED|UNAUTHENTICATED/i.test(
+      rawMessage,
+    )
+  ) {
+    return false;
+  }
+  return /\bappCheck\/(?:recaptcha-error|network-error|fetch-status-error)\b|AppCheck:\s*ReCAPTCHA error/i.test(
+    rawMessage,
+  );
+}
+
+async function awaitWithAbort(promise: Promise<void>, signal?: AbortSignal): Promise<void> {
+  if (signal?.aborted) {
+    throw new DOMException('AI request was cancelled.', 'AbortError');
+  }
+  if (!signal) {
+    await promise;
+    return;
+  }
+  await new Promise<void>((resolve, reject) => {
+    function onAbort() {
+      reject(new DOMException('AI request was cancelled.', 'AbortError'));
+    }
+    signal.addEventListener('abort', onAbort, { once: true });
+    promise.then(
+      () => {
+        signal.removeEventListener('abort', onAbort);
+        resolve();
+      },
+      (err) => {
+        signal.removeEventListener('abort', onAbort);
+        reject(err);
+      },
+    );
+  });
+}
+
+export async function withAppCheckRetry<T>(
+  fn: () => Promise<T>,
+  signal?: AbortSignal,
+): Promise<T> {
+  if (signal?.aborted) {
+    throw new DOMException('AI request was cancelled.', 'AbortError');
+  }
+  try {
+    return await fn();
+  } catch (err) {
+    if (signal?.aborted || !isTransientAppCheckError(err)) {
+      throw err;
+    }
+    await new Promise<void>((resolve, reject) => {
+      const timer = setTimeout(() => {
+        signal?.removeEventListener('abort', onAbort);
+        resolve();
+      }, 900);
+      function onAbort() {
+        clearTimeout(timer);
+        reject(new DOMException('AI request was cancelled.', 'AbortError'));
+      }
+      signal?.addEventListener('abort', onAbort, { once: true });
+    });
+    if (signal?.aborted) {
+      throw new DOMException('AI request was cancelled.', 'AbortError');
+    }
+    return await fn();
+  }
 }
 
 async function loadFirebaseRuntime() {
@@ -194,20 +313,41 @@ export class FirebaseHybridAIAdapter implements HybridAIPort {
     const firebaseStatus = getFirebaseRuntimeStatus();
     const browserCaps = await probeBrowserCapabilities(locale);
 
+    let appCheckConfigured = firebaseStatus.appCheckConfigured;
+    let appCheckMode = firebaseStatus.appCheckMode;
+    let firebaseProjectId = firebaseStatus.firebaseProjectId;
     let reason = browserCaps.reason;
+
     if (!firebaseStatus.firebaseConfigured) {
       const missing = firebaseStatus.missingVars.join(', ');
       reason = reason
         ? `${reason} Firebase Web App env vars missing: ${missing}.`
         : `Firebase Web App env vars missing: ${missing}.`;
+    } else {
+      try {
+        const { services } = await loadFirebaseRuntime();
+        firebaseProjectId =
+          services?.app.options.projectId ?? firebaseStatus.firebaseProjectId;
+        appCheckConfigured = Boolean(services?.appCheck);
+        if (!appCheckConfigured) {
+          appCheckMode = 'unconfigured';
+        }
+      } catch (err) {
+        appCheckConfigured = false;
+        appCheckMode = 'unconfigured';
+        const initMsg =
+          err instanceof Error ? err.message : 'Firebase SDK initialization failed.';
+        reason = reason ? `${reason} ${initMsg}` : initMsg;
+      }
     }
 
     return {
       browserSupportsPromptApi: browserCaps.browserSupportsPromptApi,
       onDeviceAvailability: browserCaps.onDeviceAvailability,
       firebaseConfigured: firebaseStatus.firebaseConfigured,
-      appCheckConfigured: firebaseStatus.appCheckConfigured,
-      appCheckMode: firebaseStatus.appCheckMode,
+      firebaseProjectId,
+      appCheckConfigured,
+      appCheckMode,
       cloudModelId: firebaseStatus.cloudModelId,
       userAgentSummary: browserCaps.userAgentSummary || getUserAgentSummary(),
       reason,
@@ -282,6 +422,17 @@ export class FirebaseHybridAIAdapter implements HybridAIPort {
 
     const startedAt = performance.now();
     const browserCaps = await probeBrowserCapabilities(input.locale);
+    if (
+      input.preference === 'ONLY_ON_DEVICE' &&
+      browserCaps.onDeviceAvailability !== 'available'
+    ) {
+      throw new AIAdapterError(
+        'ON_DEVICE_UNAVAILABLE',
+        browserCaps.reason ??
+          `Chrome on-device model status is "${browserCaps.onDeviceAvailability}".`,
+      );
+    }
+
     const expected = buildExpectedLanguages(
       input.locale,
       browserCaps.requestedLocaleSupported,
@@ -350,8 +501,14 @@ export class FirebaseHybridAIAdapter implements HybridAIPort {
     };
 
     try {
+      if (input.preference !== 'ONLY_ON_DEVICE') {
+        await awaitWithAbort(services.appCheckReady, input.signal);
+      }
       const model = sdk.getGenerativeModel(services.ai, hybridParams);
-      const result = await model.generateContent(prompt, { signal: input.signal });
+      const result = await withAppCheckRetry(
+        () => model.generateContent(prompt, { signal: input.signal }),
+        input.signal,
+      );
       const latencyMs = Math.max(1, Math.round(performance.now() - startedAt));
       const inferenceSource = mapObservedSource(sdk, result.response.inferenceSource);
       const rawJsonText = result.response.text();
@@ -454,6 +611,7 @@ export class FirebaseHybridAIAdapter implements HybridAIPort {
       .filter((entry) => Boolean(entry.parts[0]?.text));
 
     try {
+      await awaitWithAbort(services.appCheckReady, input.signal);
       const model = sdk.getGenerativeModel(services.ai, {
         mode: sdk.InferenceMode.ONLY_IN_CLOUD,
         inCloudParams: {
@@ -466,9 +624,17 @@ export class FirebaseHybridAIAdapter implements HybridAIPort {
         },
       });
 
-      const chat = model.startChat({ history: sdkHistory });
       const cleanQuestion = sanitizePlainText(input.question, 400);
-      const result = await chat.sendMessage(cleanQuestion, { signal: input.signal });
+      const result = await withAppCheckRetry(() => {
+        // Fresh ChatSession per attempt ensures a retry never duplicates turns in SDK history.
+        const chat = model.startChat({
+          history: sdkHistory.map((turn) => ({
+            role: turn.role,
+            parts: [...turn.parts],
+          })),
+        });
+        return chat.sendMessage(cleanQuestion, { signal: input.signal });
+      }, input.signal);
       const latencyMs = Math.max(1, Math.round(performance.now() - startedAt));
       const inferenceSource = mapObservedSource(sdk, result.response.inferenceSource);
       const answer = sanitizePlainText(result.response.text(), 1800);

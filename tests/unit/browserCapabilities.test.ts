@@ -48,5 +48,22 @@ describe('probeBrowserCapabilities', () => {
 
     expect(caps.browserSupportsPromptApi).toBe(false);
     expect(caps.onDeviceAvailability).toBe('unsupported');
+
+    const capsEs = await probeBrowserCapabilities('es');
+    expect(capsEs.reason).toMatch(/no está disponible en este navegador/i);
+  });
+
+  it('localizes unavailable and downloadable reasons in Spanish when locale is es', async () => {
+    (globalThis as Record<string, unknown>).LanguageModel = {
+      availability: async () => 'unavailable',
+    };
+    const unavailEs = await probeBrowserCapabilities('es');
+    expect(unavailEs.reason).toMatch(/no está disponible en esta configuración/i);
+
+    (globalThis as Record<string, unknown>).LanguageModel = {
+      availability: async () => 'downloadable',
+    };
+    const dlEs = await probeBrowserCapabilities('es');
+    expect(dlEs.reason).toMatch(/pueden descargarse/i);
   });
 });

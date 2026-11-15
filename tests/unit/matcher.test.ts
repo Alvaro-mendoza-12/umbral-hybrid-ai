@@ -52,4 +52,50 @@ describe('deterministic 4-state requirement matcher', () => {
     ).toBe(true);
     expect(summary.counts.MISMATCH).toBe(0);
   });
+
+  it('tracks optional (mandatory: false) criteria separately without inflating mandatory counts', () => {
+    const cse = curatedOpportunities.find((o) => o.id === 'pe-cse-ofis')!;
+    const summary = evaluateOpportunityFit(cse, emptySelfCheckProfile);
+
+    expect(summary.optionalCounts.NEEDS_CONFIRMATION).toBe(1);
+    const optionalEval = summary.evaluations.find((e) => !e.mandatory);
+    expect(optionalEval?.criterionId).toBe('req-cse-bill');
+    expect(optionalEval?.reason.en).toContain('Optional/non-blocking');
+    expect(
+      summary.mandatoryCounts.MATCH +
+        summary.mandatoryCounts.MISMATCH +
+        summary.mandatoryCounts.NEEDS_CONFIRMATION +
+        summary.mandatoryCounts.UNKNOWN,
+    ).toBe(cse.requirements.length - 1);
+  });
+
+  it('detects residence + no work/study authorization contradiction and flags MISMATCH', () => {
+    const promigas = curatedOpportunities.find((o) => o.id === 'pe-promigas-billing')!;
+    const contradictoryProfile: SelfCheckProfile = {
+      residenceCountry: 'PE',
+      workOrStudyAuthorizedInTarget: 'no',
+      educationLevel: 'technical',
+      languages: ['es'],
+      preferredModality: 'onsite',
+      experienceLevel: '1_to_3y',
+    };
+
+    const summary = evaluateOpportunityFit(promigas, contradictoryProfile);
+    const byId = Object.fromEntries(summary.evaluations.map((e) => [e.criterionId, e.status]));
+
+    expect(byId['req-promigas-country']).toBe('MISMATCH');
+    expect(summary.contradictions.length).toBe(1);
+    expect(summary.contradictions[0]?.en).toContain('PE');
+  });
+
+  it('never returns false MATCH from incomplete partial profiles', () => {
+    const opp = curatedOpportunities.find((o) => o.id === 'int-eth-esop-2027')!;
+    const partial: SelfCheckProfile = {
+      ...emptySelfCheckProfile,
+      residenceCountry: 'PE',
+    };
+    const summary = evaluateOpportunityFit(opp, partial);
+    expect(summary.counts.MATCH).toBe(0);
+    expect(summary.counts.UNKNOWN).toBeGreaterThanOrEqual(2);
+  });
 });

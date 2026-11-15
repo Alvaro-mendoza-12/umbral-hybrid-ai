@@ -6,10 +6,12 @@ import { useApp } from '../app/appContextStore';
 export function HybridReadinessPill() {
   const { t } = useTranslation();
   const {
+    aiLog,
     capabilities,
     isDownloadingModel,
     downloadProgress,
     initializeOnDeviceModel,
+    isOnline,
     preferences,
   } = useApp();
 
@@ -59,7 +61,28 @@ export function HybridReadinessPill() {
     );
   }
 
-  if (capabilities?.firebaseConfigured && preferences.inferencePreference !== 'ONLY_ON_DEVICE') {
+  if (
+    capabilities?.firebaseConfigured &&
+    isOnline &&
+    preferences.inferencePreference !== 'ONLY_ON_DEVICE'
+  ) {
+    if (!capabilities.appCheckConfigured) {
+      return (
+        <Link
+          to="/settings"
+          className="pill pill-warn"
+          style={{ textDecoration: 'none' }}
+          data-tour="hybrid-status"
+        >
+          <Wrench size={14} aria-hidden="true" />
+          <span>{t('ai.badge.appCheckPendingPill')}</span>
+        </Link>
+      );
+    }
+
+    const hasConfirmedCloud = aiLog.some(
+      (entry) => entry.outcome === 'success' && entry.inferenceSource === 'IN_CLOUD',
+    );
     return (
       <Link
         to="/settings"
@@ -68,7 +91,9 @@ export function HybridReadinessPill() {
         data-tour="hybrid-status"
       >
         <Cloud size={14} aria-hidden="true" />
-        <span>{t('ai.badge.cloudPill')}</span>
+        <span>
+          {hasConfirmedCloud ? t('ai.badge.cloudPill') : t('ai.badge.cloudConfiguredPill')}
+        </span>
       </Link>
     );
   }

@@ -20,6 +20,7 @@ export type OpportunityEditorialStatus =
   | 'open'
   | 'ongoing'
   | 'upcoming'
+  | 'review_required'
   | 'closed'
   | 'withdrawn';
 
@@ -62,6 +63,13 @@ export type CriterionKind =
   | 'legal'
   | 'document';
 
+export interface RequirementPrerequisiteGuide {
+  title: LocalizedText;
+  steps: readonly LocalizedText[];
+  officialUrl: string;
+  officialLabel: LocalizedText;
+}
+
 export interface RequirementCriterion {
   id: string;
   kind: CriterionKind;
@@ -74,6 +82,7 @@ export interface RequirementCriterion {
   requiredLanguage?: Locale;
   minExperience?: Exclude<ExperienceLevel, ''>;
   requiresExternalVerification?: boolean;
+  prerequisiteGuide?: RequirementPrerequisiteGuide;
 }
 
 export interface OpportunityCondition {
@@ -131,11 +140,20 @@ export interface Opportunity {
   isDemoFixture?: boolean;
 }
 
+export type DeadlineWindowFilter =
+  | ''
+  | 'closing_soon'
+  | 'has_deadline'
+  | 'ongoing'
+  | 'review_required';
+
 export interface CatalogFilters {
   query: string;
   country: string;
   category: CategoryId | '';
   modality: Modality | '';
+  language?: '' | Locale;
+  deadlineWindow?: DeadlineWindowFilter;
   includeClosed: boolean;
 }
 
@@ -156,6 +174,7 @@ export type CriterionMatchStatus =
 
 export interface CriterionEvaluation {
   criterionId: string;
+  mandatory: boolean;
   status: CriterionMatchStatus;
   reason: LocalizedText;
 }
@@ -163,6 +182,9 @@ export interface CriterionEvaluation {
 export interface OpportunityMatchSummary {
   evaluations: CriterionEvaluation[];
   counts: Record<CriterionMatchStatus, number>;
+  mandatoryCounts: Record<CriterionMatchStatus, number>;
+  optionalCounts: Record<CriterionMatchStatus, number>;
+  contradictions: LocalizedText[];
 }
 
 export type TrackingStatus =

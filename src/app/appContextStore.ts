@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import type { RouteMutationResult } from '../domain/routeRules';
+import type { RouteImportResult, RouteMutationResult } from '../domain/routeRules';
 import type {
   AIExecutionLogEntry,
   HybridInferencePreference,
@@ -50,6 +50,7 @@ export interface AppContextValue {
   changeSavedStatus: (opportunityId: string, status: TrackingStatus) => void;
   unsaveOpportunity: (opportunityId: string) => SavedOpportunityTracking | null;
   restoreSavedOpportunity: (snapshot: SavedOpportunityTracking) => void;
+  importRouteJson: (rawJson: string) => RouteImportResult;
   profile: SelfCheckProfile;
   updateProfile: (next: SelfCheckProfile) => void;
   resetProfile: () => void;
@@ -59,6 +60,8 @@ export interface AppContextValue {
   refreshCapabilities: () => Promise<void>;
   isDownloadingModel: boolean;
   downloadProgress: number | null;
+  downloadError: { code: string; details: string } | null;
+  clearDownloadError: () => void;
   initializeOnDeviceModel: () => Promise<void>;
   aiLog: AIExecutionLogEntry[];
   clearAiLog: () => void;

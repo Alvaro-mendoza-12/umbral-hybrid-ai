@@ -26,7 +26,7 @@ export const curatedOpportunities: readonly Opportunity[] = [
     countryCode: 'INT',
     eligibleCountries: ['PE', 'CO', 'MX', 'ES', 'US', 'OTHER'],
     scope: 'international',
-    locationLabel: tr('Zúrich, Suiza · Presencial', 'Zurich, Switzerland · Onsite'),
+    locationLabel: tr('Zúrich, Suiza', 'Zurich, Switzerland'),
     modality: 'onsite',
     cost: {
       type: 'funded',
@@ -193,7 +193,7 @@ export const curatedOpportunities: readonly Opportunity[] = [
     countryCode: 'INT',
     eligibleCountries: ['PE', 'CO', 'MX', 'US', 'ES', 'OTHER'],
     scope: 'international',
-    locationLabel: tr('Leiden, Países Bajos · Presencial', 'Leiden, Netherlands · Onsite'),
+    locationLabel: tr('Leiden, Países Bajos', 'Leiden, Netherlands'),
     modality: 'onsite',
     cost: {
       type: 'paid',
@@ -414,6 +414,28 @@ export const curatedOpportunities: readonly Opportunity[] = [
           'Onsite availability in Trujillo, La Libertad and legal work authorization in Peru.',
         ),
         sourceId: 'src-promigas',
+        prerequisiteGuide: {
+          title: tr(
+            'Micro-guía: Certificado Único Laboral (CUL)',
+            'Micro-guide: Certificado Único Laboral (CUL)',
+          ),
+          steps: [
+            tr(
+              'Ingresa al portal oficial de Empleos Perú con tu DNI o Carné de Extranjería.',
+              'Sign in to the official Empleos Perú portal with your DNI or Foreigner ID (CE).',
+            ),
+            tr(
+              'Valida tus datos de identidad con RENIEC/Migraciones sin costo.',
+              'Verify your identity details through RENIEC/Migraciones at no cost.',
+            ),
+            tr(
+              'Descarga el PDF oficial vigente por 3 meses para adjuntarlo en tu postulación formal si te lo solicitan.',
+              'Download the official PDF valid for 3 months to attach if requested during hiring.',
+            ),
+          ],
+          officialUrl: 'https://www.gob.pe/355-obtener-el-certificado-unico-laboral-cul',
+          officialLabel: tr('Tramitar CUL gratis en gob.pe', 'Get free CUL on gob.pe'),
+        },
       },
       {
         id: 'req-promigas-mod',
@@ -452,7 +474,10 @@ export const curatedOpportunities: readonly Opportunity[] = [
       },
     ],
     unknownFields: [
-      tr('Periodicidad exacta del pago (mensual implícita, no textual), hora de cierre y patrocinio migratorio.', 'Exact pay frequency, closing hour, and immigration sponsorship.'),
+      tr(
+        'Periodicidad exacta del pago (mensual implícita), hora de cierre y patrocinio migratorio. El portal Soy Capaz (HTTP 200 al 14-11-2026) marca «Disponible» con 1 vacante hasta el 27-11-2026; requiere confirmación directa por correo con Talento de Promigas.',
+        'Exact pay frequency, closing hour, and sponsorship. Soy Capaz portal (HTTP 200 on 14 Nov 2026) reads “Disponible” with 1 slot through 27 Nov 2026; requires direct email confirmation with Promigas Talent.',
+      ),
     ],
     sources: [
       {
@@ -460,13 +485,13 @@ export const curatedOpportunities: readonly Opportunity[] = [
         title: tr('CONADIS Soy Capaz · Vacante Promigas', 'CONADIS Soy Capaz · Promigas Vacancy'),
         url: 'https://soycapaz.conadisperu.gob.pe/jobs/vacante-196b171e',
         publisher: 'CONADIS Perú',
-        verifiedAt: '2026-11-11',
+        verifiedAt: '2026-11-14',
       },
     ],
-    editorialStatus: 'open',
-    verifiedAt: '2026-11-11',
+    editorialStatus: 'review_required',
+    verifiedAt: '2026-11-14',
     reviewBy: '2026-11-25',
-    sourceVersion: '2026.11.11',
+    sourceVersion: '2026.11.14',
   },
   {
     id: 'pe-xylem-electromechanical',
@@ -568,7 +593,10 @@ export const curatedOpportunities: readonly Opportunity[] = [
       },
     ],
     unknownFields: [
-      tr('Duración exacta del contrato por obra y política de patrocinio migratorio.', 'Exact duration of the fixed-project contract and immigration sponsorship policy.'),
+      tr(
+        'Duración exacta del contrato por obra y patrocinio migratorio. El portal Soy Capaz (HTTP 200 al 14-11-2026) figura «Disponible» con 1 plaza de San Marcos entre 3 puestos listados hasta el 20-11-2026; requiere confirmación directa por correo con RR. HH. de Xylem.',
+        'Exact fixed-project duration and sponsorship. Soy Capaz portal (HTTP 200 on 14 Nov 2026) shows “Disponible” with 1 San Marcos slot among 3 listed roles through 20 Nov 2026; requires direct email confirmation with Xylem HR.',
+      ),
     ],
     sources: [
       {
@@ -576,13 +604,13 @@ export const curatedOpportunities: readonly Opportunity[] = [
         title: tr('CONADIS Soy Capaz · Vacante Xylem', 'CONADIS Soy Capaz · Xylem Vacancy'),
         url: 'https://soycapaz.conadisperu.gob.pe/jobs/vacante-d643c58d',
         publisher: 'CONADIS Perú',
-        verifiedAt: '2026-11-11',
+        verifiedAt: '2026-11-14',
       },
     ],
-    editorialStatus: 'open',
-    verifiedAt: '2026-11-11',
+    editorialStatus: 'review_required',
+    verifiedAt: '2026-11-14',
     reviewBy: '2026-11-19',
-    sourceVersion: '2026.11.11',
+    sourceVersion: '2026.11.14',
   },
   {
     id: 'pe-beca-18-2027',
@@ -640,6 +668,28 @@ export const curatedOpportunities: readonly Opportunity[] = [
         mandatory: true,
         text: tr('Acreditación académica y de vulnerabilidad/modalidad según bases oficiales 2027.', 'Academic achievement and category/vulnerability evidence per 2027 rules.'),
         sourceId: 'src-pronabec-b18',
+        prerequisiteGuide: {
+          title: tr(
+            'Micro-guía: Clasificación Socioeconómica (CSE / SISFOH)',
+            'Micro-guide: Socioeconomic Classification (CSE / SISFOH)',
+          ),
+          steps: [
+            tr(
+              'Reúne el DNI o Carné de Extranjería de todos los integrantes de tu hogar y un recibo de luz reciente (máximo 3 meses, si cuentas con servicio).',
+              'Gather the DNI or Foreigner ID of every household member and a recent electricity bill (up to 3 months old, if available).',
+            ),
+            tr(
+              'Acércate a la Unidad Local de Empadronamiento (ULE) de tu municipalidad para llenar el Formato S100.',
+              'Visit your municipality Local Registry Unit (ULE) to complete Form S100.',
+            ),
+            tr(
+              'Atiende la visita domiciliaria para la Ficha Socioeconómica Única (FSU); el PGH emite tu clasificación oficial en hasta 25 días hábiles.',
+              'Complete the home visit for the Household Form (FSU); PGH issues your official classification within up to 25 business days.',
+            ),
+          ],
+          officialUrl: 'https://www.gob.pe/83555-solicitar-la-clasificacion-socioeconomica-cse-de-tu-hogar',
+          officialLabel: tr('Cómo solicitar tu CSE en gob.pe', 'How to request your CSE on gob.pe'),
+        },
       },
     ],
     conditions: [
@@ -694,7 +744,7 @@ export const curatedOpportunities: readonly Opportunity[] = [
     countryCode: 'PE',
     eligibleCountries: ['PE'],
     scope: 'national',
-    locationLabel: tr('En línea · MTPE Perú', 'Online · MTPE Peru'),
+    locationLabel: tr('MTPE Perú', 'MTPE Peru'),
     modality: 'online',
     cost: {
       type: 'free',
@@ -869,20 +919,20 @@ export const curatedOpportunities: readonly Opportunity[] = [
         title: tr('Gob.pe · Solicitar la CSE del hogar', 'Gob.pe · Request household CSE'),
         url: 'https://www.gob.pe/83555-solicitar-la-clasificacion-socioeconomica-cse-de-tu-hogar',
         publisher: 'OFIS / Gob.pe',
-        verifiedAt: '2026-11-11',
+        verifiedAt: '2026-11-14',
       },
       {
         id: 'src-ofis-ule',
         title: tr('Gob.pe · Directorio oficial de ULE', 'Gob.pe · Official ULE directory'),
         url: 'https://www.gob.pe/90813-conocer-la-direccion-de-la-unidad-local-de-empadronamiento-de-tu-municipalidad',
         publisher: 'OFIS / Gob.pe',
-        verifiedAt: '2026-11-11',
+        verifiedAt: '2026-11-14',
       },
     ],
     editorialStatus: 'ongoing',
-    verifiedAt: '2026-11-11',
-    reviewBy: '2026-12-11',
-    sourceVersion: '2026.11.11',
+    verifiedAt: '2026-11-14',
+    reviewBy: '2026-12-14',
+    sourceVersion: '2026.11.14',
   },
   {
     id: 'co-sena-english-1',
@@ -1165,7 +1215,10 @@ export const curatedOpportunities: readonly Opportunity[] = [
       },
     ],
     unknownFields: [
-      tr('Remuneración económica, modalidad exacta (presencial/híbrida) y fecha de cierre.', 'Exact stipend/salary, onsite vs hybrid split, and closing date.'),
+      tr(
+        'Remuneración económica, modalidad exacta (presencial/híbrida) y fecha de cierre. La ficha en Amazon Jobs (HTTP 200 al 14-11-2026) muestra «Apply now» activo y ventana de graduación julio 2024–julio 2027 junto con matrícula activa para prácticas de 12 meses.',
+        'Exact stipend/salary, onsite vs hybrid split, and closing date. Amazon Jobs listing (HTTP 200 on 14 Nov 2026) shows active “Apply now” and states a July 2024–July 2027 graduation window alongside active student enrollment for 12 months.',
+      ),
     ],
     sources: [
       {
@@ -1173,13 +1226,13 @@ export const curatedOpportunities: readonly Opportunity[] = [
         title: tr('Amazon Jobs · AWS Demand Generation Intern 10506034', 'Amazon Jobs · AWS Demand Generation Intern 10506034'),
         url: 'https://www.amazon.jobs/en/jobs/10506034/aws-demand-generation-intern',
         publisher: 'Amazon Jobs',
-        verifiedAt: '2026-11-11',
+        verifiedAt: '2026-11-14',
       },
     ],
-    editorialStatus: 'open',
-    verifiedAt: '2026-11-11',
+    editorialStatus: 'review_required',
+    verifiedAt: '2026-11-14',
     reviewBy: '2026-11-28',
-    sourceVersion: '2026.11.11',
+    sourceVersion: '2026.11.14',
   },
   {
     id: 'mx-unam-excel',
@@ -1195,7 +1248,7 @@ export const curatedOpportunities: readonly Opportunity[] = [
     countryCode: 'MX',
     eligibleCountries: ['MX', 'PE', 'CO', 'ES', 'US', 'OTHER'],
     scope: 'international',
-    locationLabel: tr('En línea · UNAM México (abierto al público)', 'Online · UNAM Mexico (open to public)'),
+    locationLabel: tr('UNAM México (abierto al público)', 'UNAM Mexico (open to public)'),
     modality: 'online',
     cost: {
       type: 'free',
@@ -1259,13 +1312,13 @@ export const curatedOpportunities: readonly Opportunity[] = [
         title: tr('UNAM Aprendo+ · Portal oficial', 'UNAM Aprendo+ · Official portal'),
         url: 'https://aprendomas.cuaed.unam.mx/',
         publisher: 'UNAM CUAED',
-        verifiedAt: '2026-11-11',
+        verifiedAt: '2026-11-14',
       },
     ],
     editorialStatus: 'ongoing',
-    verifiedAt: '2026-11-11',
-    reviewBy: '2026-12-11',
-    sourceVersion: '2026.11.11',
+    verifiedAt: '2026-11-14',
+    reviewBy: '2026-12-14',
+    sourceVersion: '2026.11.14',
   },
   {
     id: 'mx-nafin-women',
@@ -1356,13 +1409,13 @@ export const curatedOpportunities: readonly Opportunity[] = [
         title: tr('NAFIN · Mujeres Empresarias', 'NAFIN · Women Entrepreneurs'),
         url: 'https://www.nafin.com/portalnf/content/financiamiento/mujeres-empresarias.html',
         publisher: 'NAFIN México',
-        verifiedAt: '2026-11-11',
+        verifiedAt: '2026-11-14',
       },
     ],
     editorialStatus: 'ongoing',
-    verifiedAt: '2026-11-11',
-    reviewBy: '2026-12-11',
-    sourceVersion: '2026.11.11',
+    verifiedAt: '2026-11-14',
+    reviewBy: '2026-12-14',
+    sourceVersion: '2026.11.14',
   },
   {
     id: 'es-enisa-digital-women',
@@ -1446,13 +1499,13 @@ export const curatedOpportunities: readonly Opportunity[] = [
         title: tr('ENISA · Emprendedoras Digitales', 'ENISA · Digital Women Entrepreneurs'),
         url: 'https://www.enisa.es/servicios/financiacion/emprendedoras-digitales',
         publisher: 'ENISA España',
-        verifiedAt: '2026-11-11',
+        verifiedAt: '2026-11-14',
       },
     ],
     editorialStatus: 'ongoing',
-    verifiedAt: '2026-11-11',
-    reviewBy: '2026-12-11',
-    sourceVersion: '2026.11.11',
+    verifiedAt: '2026-11-14',
+    reviewBy: '2026-12-14',
+    sourceVersion: '2026.11.14',
   },
   {
     id: 'es-cybersecurity-94',
@@ -1471,7 +1524,7 @@ export const curatedOpportunities: readonly Opportunity[] = [
     countryCode: 'ES',
     eligibleCountries: ['ES'],
     scope: 'regional',
-    locationLabel: tr('Teleformación · Andalucía, España', 'Online training · Andalusia, Spain'),
+    locationLabel: tr('Andalucía, España', 'Andalusia, Spain'),
     modality: 'online',
     cost: {
       type: 'free',
@@ -1530,7 +1583,10 @@ export const curatedOpportunities: readonly Opportunity[] = [
       },
     ],
     unknownFields: [
-      tr('Si el centro habilita entrega electrónica alternativa además de la presencial indicada.', 'Whether the centre accepts any alternative electronic submission.'),
+      tr(
+        'Disponibilidad restante de las 20 plazas y posible entrega electrónica. La ficha oficial de Junta de Andalucía (HTTP 200 al 14-11-2026) figura «En plazo de solicitud» hasta el 18-11-2026 con solicitud PDF entregada presencialmente en Almería.',
+        'Remaining seat count among the 20 seats and electronic alternatives. Junta de Andalucía listing (HTTP 200 on 14 Nov 2026) shows “En plazo de solicitud” through 18 Nov 2026 with a PDF application delivered in person in Almería.',
+      ),
     ],
     sources: [
       {
@@ -1538,13 +1594,13 @@ export const curatedOpportunities: readonly Opportunity[] = [
         title: tr('Junta de Andalucía · Curso 94 IFCT050PO', 'Junta de Andalucía · Course 94 IFCT050PO'),
         url: 'https://www.juntadeandalucia.es/empleoformacionytrabajoautonomo/formacion/web/buscador-de-cursos/94',
         publisher: 'Junta de Andalucía',
-        verifiedAt: '2026-11-11',
+        verifiedAt: '2026-11-14',
       },
     ],
-    editorialStatus: 'open',
-    verifiedAt: '2026-11-11',
+    editorialStatus: 'review_required',
+    verifiedAt: '2026-11-14',
     reviewBy: '2026-11-18',
-    sourceVersion: '2026.11.11',
+    sourceVersion: '2026.11.14',
   },
   {
     id: 'us-pell-2026',
@@ -1569,8 +1625,8 @@ export const curatedOpportunities: readonly Opportunity[] = [
     deadline: {
       precision: 'date',
       closesOn: '2027-06-30',
-      timeZone: 'America/New_York',
-      label: tr('Plazo federal: 30 jun 2027 (estados/universidades pueden cerrar antes)', 'Federal deadline: 30 Jun 2027 (state/school deadlines may be earlier)'),
+      timeZone: 'America/Chicago',
+      label: tr('Plazo federal: 30 jun 2027, 23:59 CT (estados/universidades pueden cerrar antes)', 'Federal deadline: 30 Jun 2027, 11:59 p.m. CT (state/school deadlines may be earlier)'),
     },
     sourceLanguage: 'en',
     officialUrl: 'https://studentaid.gov/understand-aid/types/grants/pell',
@@ -1632,20 +1688,20 @@ export const curatedOpportunities: readonly Opportunity[] = [
         title: tr('StudentAid.gov · Federal Pell Grants', 'StudentAid.gov · Federal Pell Grants'),
         url: 'https://studentaid.gov/understand-aid/types/grants/pell',
         publisher: 'U.S. Department of Education',
-        verifiedAt: '2026-11-11',
+        verifiedAt: '2026-11-14',
       },
       {
         id: 'src-fsa-fafsa',
         title: tr('StudentAid.gov · Solicitud FAFSA', 'StudentAid.gov · Apply for FAFSA'),
         url: 'https://studentaid.gov/h/apply-for-aid/fafsa',
         publisher: 'U.S. Department of Education',
-        verifiedAt: '2026-11-11',
+        verifiedAt: '2026-11-14',
       },
     ],
     editorialStatus: 'open',
-    verifiedAt: '2026-11-11',
+    verifiedAt: '2026-11-14',
     reviewBy: '2027-01-15',
-    sourceVersion: '2026.11.11',
+    sourceVersion: '2026.11.14',
   },
   {
     id: 'us-va-nurse',
@@ -1750,13 +1806,13 @@ export const curatedOpportunities: readonly Opportunity[] = [
         title: tr('USAJOBS · Anuncio 889380900', 'USAJOBS · Announcement 889380900'),
         url: 'https://www.usajobs.gov/job/889380900',
         publisher: 'USAJOBS / U.S. VA',
-        verifiedAt: '2026-11-11',
+        verifiedAt: '2026-11-14',
       },
     ],
     editorialStatus: 'open',
-    verifiedAt: '2026-11-11',
+    verifiedAt: '2026-11-14',
     reviewBy: '2027-01-15',
-    sourceVersion: '2026.11.11',
+    sourceVersion: '2026.11.14',
   },
   {
     id: 'int-cs50x-2026',
@@ -1772,7 +1828,7 @@ export const curatedOpportunities: readonly Opportunity[] = [
     countryCode: 'INT',
     eligibleCountries: ['PE', 'CO', 'MX', 'ES', 'US', 'OTHER'],
     scope: 'international',
-    locationLabel: tr('Internacional · En línea a tu ritmo', 'International · Self-paced online'),
+    locationLabel: tr('Internacional · A tu ritmo', 'International · Self-paced'),
     modality: 'online',
     cost: {
       type: 'free',
@@ -1862,7 +1918,7 @@ export const curatedOpportunities: readonly Opportunity[] = [
     countryCode: 'INT',
     eligibleCountries: ['PE', 'CO', 'MX', 'ES', 'US', 'OTHER'],
     scope: 'international',
-    locationLabel: tr('Internacional · En línea (Coursera)', 'International · Online (Coursera)'),
+    locationLabel: tr('Internacional · Coursera', 'International · Coursera'),
     modality: 'online',
     cost: {
       type: 'paid',
@@ -1952,7 +2008,7 @@ export const curatedOpportunities: readonly Opportunity[] = [
     countryCode: 'INT',
     eligibleCountries: ['PE', 'CO', 'MX', 'ES', 'US', 'OTHER'],
     scope: 'international',
-    locationLabel: tr('Internacional · En línea', 'International · Online'),
+    locationLabel: tr('Internacional', 'International'),
     modality: 'online',
     cost: {
       type: 'free',
@@ -2032,8 +2088,8 @@ export const curatedOpportunities: readonly Opportunity[] = [
       'InnovaSuyu La Libertad · Innovative Ventures (CLOSED)',
     ),
     summary: tr(
-      'Concurso regional de ProInnóvate para startups con MVP y tracción en La Libertad. El plazo ampliado cerró el 13 nov 2026 a las 13:00.',
-      'ProInnóvate regional contest for startups with an MVP and traction in La Libertad. Extended window closed 13 Nov 2026 at 13:00.',
+      'Concurso regional de ProInnóvate para startups con MVP y tracción en La Libertad. El plazo ampliado cerró el 12 nov 2026 a las 13:00.',
+      'ProInnóvate regional contest for startups with an MVP and traction in La Libertad. Extended window closed 12 Nov 2026 at 13:00.',
     ),
     benefit: tr('Cofinanciamiento no reembolsable y acompañamiento técnico según bases.', 'Non-repayable co-funding and technical mentoring per official rules.'),
     providerName: tr('ProInnóvate · PRODUCE Perú', 'ProInnóvate · PRODUCE Peru'),
@@ -2049,22 +2105,22 @@ export const curatedOpportunities: readonly Opportunity[] = [
     deadline: {
       precision: 'instant',
       opensOn: '2026-10-23',
-      closesOn: '2026-11-13',
-      deadlineAt: '2026-11-13T13:00:00-05:00',
+      closesOn: '2026-11-12',
+      deadlineAt: '2026-11-12T13:00:00-05:00',
       timeZone: 'America/Lima',
-      label: tr('Cerró el 13 nov 2026, 13:00 (hora de Perú)', 'Closed 13 Nov 2026, 13:00 Peru time'),
+      label: tr('Cerró el 12 nov 2026, 13:00 (hora de Perú)', 'Closed 12 Nov 2026, 13:00 Peru time'),
     },
     sourceLanguage: 'es',
     officialUrl:
       'https://innovasuyu.proinnovate.gob.pe/concursos-regionales-2026-la-libertad-emprendimientos-innovadores-segunda-convocatoria/',
     officialActionLabel: tr('Ver convocatoria cerrada en ProInnóvate', 'View closed call on ProInnóvate'),
     officialInstructions: tr(
-      'Convocatoria cerrada ayer (13 nov 2026). Usa la ficha únicamente como referencia de requisitos para futuras ediciones regionales.',
-      'Window closed yesterday (13 Nov 2026). Use this card solely as reference for future regional cycles.',
+      'Convocatoria cerrada el 12 nov 2026 (13:00 PET). Usa la ficha únicamente como referencia de requisitos para futuras ediciones regionales.',
+      'Window closed 12 Nov 2026 (13:00 PET). Use this card solely as reference for future regional cycles.',
     ),
     keyCondition: tr(
-      'Cierre vencido el 13-11-2026; no acepta nuevas postulaciones.',
-      'Deadline passed on 13 Nov 2026; no longer accepting applications.',
+      'Cierre vencido el 12-11-2026; no acepta nuevas postulaciones.',
+      'Deadline passed on 12 Nov 2026; no longer accepting applications.',
     ),
     requirements: [
       {

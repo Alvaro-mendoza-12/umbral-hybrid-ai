@@ -3,11 +3,17 @@ import type {
   CriterionMatchStatus,
   EducationLevel,
   ExperienceLevel,
+  LocalizedText,
   Opportunity,
   OpportunityMatchSummary,
   RequirementCriterion,
   SelfCheckProfile,
 } from './types';
+
+type EvaluationCore = {
+  status: CriterionMatchStatus;
+  reason: LocalizedText;
+};
 
 const EDUCATION_RANK: Record<Exclude<EducationLevel, ''>, number> = {
   primary: 1,
@@ -45,15 +51,14 @@ export function hasAnyProfileInput(profile: SelfCheckProfile): boolean {
   );
 }
 
-export function evaluateCriterion(
+function evaluateCriterionCore(
   criterion: RequirementCriterion,
   profile: SelfCheckProfile,
-): CriterionEvaluation {
+): EvaluationCore {
   switch (criterion.kind) {
     case 'country': {
       if (!criterion.allowedCountries || criterion.allowedCountries.length === 0) {
         return {
-          criterionId: criterion.id,
           status: 'UNKNOWN',
           reason: {
             es: 'La fuente no precisa países elegibles de forma cerrada.',
@@ -62,8 +67,19 @@ export function evaluateCriterion(
         };
       }
       if (!profile.residenceCountry) {
+        if (
+          criterion.requiresExternalVerification &&
+          profile.workOrStudyAuthorizedInTarget === 'no'
+        ) {
+          return {
+            status: 'NEEDS_CONFIRMATION',
+            reason: {
+              es: 'Indicas no tener autorización legal en el destino, pero falta tu país de residencia: confirma las reglas migratorias en la convocatoria.',
+              en: 'You answered No for target authorization, while residence country is unset: verify permit/citizenship rules directly.',
+            },
+          };
+        }
         return {
-          criterionId: criterion.id,
           status: 'UNKNOWN',
           reason: {
             es: 'Indica tu país de residencia en la autocomprobación para comparar.',
@@ -72,21 +88,27 @@ export function evaluateCriterion(
         };
       }
       if (criterion.allowedCountries.includes(profile.residenceCountry)) {
-        if (
-          criterion.requiresExternalVerification &&
-          profile.workOrStudyAuthorizedInTarget !== 'yes'
-        ) {
-          return {
-            criterionId: criterion.id,
-            status: 'NEEDS_CONFIRMATION',
-            reason: {
-              es: 'País compatible en principio; debes confirmar ciudadanía, visa o permiso vigente en la convocatoria.',
-              en: 'Country aligns in principle; confirm citizenship, visa, or valid permit in the official call.',
-            },
-          };
+        if (criterion.requiresExternalVerification) {
+          if (profile.workOrStudyAuthorizedInTarget === 'no') {
+            return {
+              status: 'MISMATCH',
+              reason: {
+                es: 'Tu país coincide en principio, pero marcaste que no cuentas con autorización legal/ciudadanía requerida en el destino.',
+                en: 'Residence country aligns in principle, but you indicated you lack required citizenship or legal authorization in the target location.',
+              },
+            };
+          }
+          if (profile.workOrStudyAuthorizedInTarget !== 'yes') {
+            return {
+              status: 'NEEDS_CONFIRMATION',
+              reason: {
+                es: 'País compatible en principio; debes confirmar ciudadanía, visa o permiso vigente en la convocatoria.',
+                en: 'Country aligns in principle; confirm citizenship, visa, or valid permit in the official call.',
+              },
+            };
+          }
         }
         return {
-          criterionId: criterion.id,
           status: 'MATCH',
           reason: {
             es: 'Tu país indicado figura dentro del alcance declarado por la fuente.',
@@ -97,7 +119,6 @@ export function evaluateCriterion(
 
       if (profile.workOrStudyAuthorizedInTarget === 'yes') {
         return {
-          criterionId: criterion.id,
           status: 'NEEDS_CONFIRMATION',
           reason: {
             es: 'Indicas autorización en el destino, pero la ficha restringe el país/sede: confirma tu documento exacto.',
@@ -107,7 +128,6 @@ export function evaluateCriterion(
       }
 
       return {
-        criterionId: criterion.id,
         status: 'MISMATCH',
         reason: {
           es: 'Tu país indicado no coincide con la ubicación o elegibilidad geográfica publicada.',
@@ -119,7 +139,6 @@ export function evaluateCriterion(
     case 'modality': {
       if (!criterion.requiredModalities || criterion.requiredModalities.length === 0) {
         return {
-          criterionId: criterion.id,
           status: 'UNKNOWN',
           reason: {
             es: 'La convocatoria no publicó modalidad detallada.',
@@ -129,7 +148,6 @@ export function evaluateCriterion(
       }
       if (criterion.requiredModalities.includes('unknown')) {
         return {
-          criterionId: criterion.id,
           status: 'UNKNOWN',
           reason: {
             es: 'Modalidad no publicada por la institución.',
@@ -139,7 +157,6 @@ export function evaluateCriterion(
       }
       if (!profile.preferredModality) {
         return {
-          criterionId: criterion.id,
           status: 'UNKNOWN',
           reason: {
             es: 'Elige tu modalidad disponible en la autocomprobación para comparar.',
@@ -149,7 +166,6 @@ export function evaluateCriterion(
       }
       if (criterion.requiredModalities.includes(profile.preferredModality)) {
         return {
-          criterionId: criterion.id,
           status: 'MATCH',
           reason: {
             es: 'Coincide con tu preferencia de modalidad.',
@@ -163,7 +179,6 @@ export function evaluateCriterion(
           criterion.requiredModalities.includes('onsite'))
       ) {
         return {
-          criterionId: criterion.id,
           status: 'NEEDS_CONFIRMATION',
           reason: {
             es: 'Indicaste disponibilidad híbrida; verifica si puedes cumplir el formato exacto publicado.',
@@ -172,7 +187,6 @@ export function evaluateCriterion(
         };
       }
       return {
-        criterionId: criterion.id,
         status: 'MISMATCH',
         reason: {
           es: 'No coincide con la modalidad que marcaste como disponible.',
@@ -184,7 +198,6 @@ export function evaluateCriterion(
     case 'education': {
       if (!criterion.minEducation) {
         return {
-          criterionId: criterion.id,
           status: 'NEEDS_CONFIRMATION',
           reason: {
             es: 'Verifica directamente tu titulación específica frente a las bases oficiales.',
@@ -194,7 +207,6 @@ export function evaluateCriterion(
       }
       if (!profile.educationLevel) {
         return {
-          criterionId: criterion.id,
           status: 'UNKNOWN',
           reason: {
             es: 'Selecciona tu nivel educativo actual para comparar este requisito.',
@@ -205,7 +217,6 @@ export function evaluateCriterion(
       if (criterion.minEducation === 'student_enrolled') {
         if (profile.educationLevel === 'student_enrolled') {
           return {
-            criterionId: criterion.id,
             status: criterion.requiresExternalVerification ? 'NEEDS_CONFIRMATION' : 'MATCH',
             reason: criterion.requiresExternalVerification
               ? {
@@ -219,7 +230,6 @@ export function evaluateCriterion(
           };
         }
         return {
-          criterionId: criterion.id,
           status: 'MISMATCH',
           reason: {
             es: 'Esta oportunidad solicita matrícula estudiantil vigente.',
@@ -232,7 +242,6 @@ export function evaluateCriterion(
       const reqRank = EDUCATION_RANK[criterion.minEducation];
       if (userRank >= reqRank) {
         return {
-          criterionId: criterion.id,
           status: criterion.requiresExternalVerification ? 'NEEDS_CONFIRMATION' : 'MATCH',
           reason: criterion.requiresExternalVerification
             ? {
@@ -246,7 +255,6 @@ export function evaluateCriterion(
         };
       }
       return {
-        criterionId: criterion.id,
         status: 'MISMATCH',
         reason: {
           es: 'El nivel educativo mínimo publicado es superior al indicado en tu perfil.',
@@ -258,7 +266,6 @@ export function evaluateCriterion(
     case 'language': {
       if (!criterion.requiredLanguage) {
         return {
-          criterionId: criterion.id,
           status: 'NEEDS_CONFIRMATION',
           reason: {
             es: 'Confirma el idioma y nivel requerido en la fuente oficial.',
@@ -268,7 +275,6 @@ export function evaluateCriterion(
       }
       if (profile.languages.length === 0) {
         return {
-          criterionId: criterion.id,
           status: 'UNKNOWN',
           reason: {
             es: 'Marca tus idiomas disponibles en la autocomprobación.',
@@ -278,7 +284,6 @@ export function evaluateCriterion(
       }
       if (profile.languages.includes(criterion.requiredLanguage)) {
         return {
-          criterionId: criterion.id,
           status: criterion.requiresExternalVerification ? 'NEEDS_CONFIRMATION' : 'MATCH',
           reason: criterion.requiresExternalVerification
             ? {
@@ -292,7 +297,6 @@ export function evaluateCriterion(
         };
       }
       return {
-        criterionId: criterion.id,
         status: 'MISMATCH',
         reason: {
           es: 'No marcaste el idioma requerido por esta oportunidad.',
@@ -304,7 +308,6 @@ export function evaluateCriterion(
     case 'experience': {
       if (!criterion.minExperience) {
         return {
-          criterionId: criterion.id,
           status: 'NEEDS_CONFIRMATION',
           reason: {
             es: 'Confirma la experiencia práctica específica solicitada en la convocatoria.',
@@ -314,7 +317,6 @@ export function evaluateCriterion(
       }
       if (!profile.experienceLevel) {
         return {
-          criterionId: criterion.id,
           status: 'UNKNOWN',
           reason: {
             es: 'Selecciona tu rango de experiencia para comparar este requisito.',
@@ -326,7 +328,6 @@ export function evaluateCriterion(
       const reqRank = EXPERIENCE_RANK[criterion.minExperience];
       if (userRank >= reqRank) {
         return {
-          criterionId: criterion.id,
           status: criterion.requiresExternalVerification ? 'NEEDS_CONFIRMATION' : 'MATCH',
           reason: criterion.requiresExternalVerification
             ? {
@@ -340,7 +341,6 @@ export function evaluateCriterion(
         };
       }
       return {
-        criterionId: criterion.id,
         status: 'MISMATCH',
         reason: {
           es: 'La experiencia mínima publicada supera el rango indicado.',
@@ -354,7 +354,6 @@ export function evaluateCriterion(
     case 'document':
     default:
       return {
-        criterionId: criterion.id,
         status: 'NEEDS_CONFIRMATION',
         reason: {
           es: 'UMBRAL no recopila edad, identidad ni documentos personales: confirma este punto directamente en la fuente oficial.',
@@ -364,6 +363,62 @@ export function evaluateCriterion(
   }
 }
 
+export function evaluateCriterion(
+  criterion: RequirementCriterion,
+  profile: SelfCheckProfile,
+): CriterionEvaluation {
+  const core = evaluateCriterionCore(criterion, profile);
+  const reason: LocalizedText = criterion.mandatory
+    ? core.reason
+    : {
+        es: `${core.reason.es} (Criterio opcional/no excluyente según las bases publicadas).`,
+        en: `${core.reason.en} (Optional/non-blocking item per published notes).`,
+      };
+
+  return {
+    criterionId: criterion.id,
+    mandatory: criterion.mandatory,
+    status: core.status,
+    reason,
+  };
+}
+
+export function detectProfileContradictions(
+  opportunity: Opportunity,
+  profile: SelfCheckProfile,
+): LocalizedText[] {
+  const contradictions: LocalizedText[] = [];
+  const hasStrictCountryPermitCheck = opportunity.requirements.some(
+    (req) =>
+      req.kind === 'country' &&
+      req.requiresExternalVerification &&
+      req.allowedCountries?.includes(profile.residenceCountry),
+  );
+
+  if (
+    hasStrictCountryPermitCheck &&
+    profile.residenceCountry &&
+    profile.residenceCountry !== 'OTHER' &&
+    profile.workOrStudyAuthorizedInTarget === 'no'
+  ) {
+    contradictions.push({
+      es: `Indicaste residencia en ${profile.residenceCountry} pero respondiste «No» a autorización legal para trabajar/estudiar allí. Confirma si posees permiso o ciudadanía vigente, ya que la falta de autorización suele bloquear esta convocatoria.`,
+      en: `You selected residence in ${profile.residenceCountry} yet answered "No" to legal work/study authorization there. Double-check that answer if you already hold status/citizenship, as missing authorization typically blocks eligibility.`,
+    });
+  }
+
+  return contradictions;
+}
+
+function emptyStatusCounts(): Record<CriterionMatchStatus, number> {
+  return {
+    MATCH: 0,
+    MISMATCH: 0,
+    NEEDS_CONFIRMATION: 0,
+    UNKNOWN: 0,
+  };
+}
+
 export function evaluateOpportunityFit(
   opportunity: Opportunity,
   profile: SelfCheckProfile,
@@ -371,14 +426,24 @@ export function evaluateOpportunityFit(
   const evaluations = opportunity.requirements.map((criterion) =>
     evaluateCriterion(criterion, profile),
   );
-  const counts: Record<CriterionMatchStatus, number> = {
-    MATCH: 0,
-    MISMATCH: 0,
-    NEEDS_CONFIRMATION: 0,
-    UNKNOWN: 0,
-  };
+  const counts = emptyStatusCounts();
+  const mandatoryCounts = emptyStatusCounts();
+  const optionalCounts = emptyStatusCounts();
+
   for (const item of evaluations) {
     counts[item.status] += 1;
+    if (item.mandatory) {
+      mandatoryCounts[item.status] += 1;
+    } else {
+      optionalCounts[item.status] += 1;
+    }
   }
-  return { evaluations, counts };
+
+  return {
+    evaluations,
+    counts,
+    mandatoryCounts,
+    optionalCounts,
+    contradictions: detectProfileContradictions(opportunity, profile),
+  };
 }

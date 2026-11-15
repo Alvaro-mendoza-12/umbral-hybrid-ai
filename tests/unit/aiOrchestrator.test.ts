@@ -169,4 +169,123 @@ describe('AIOrchestrator', () => {
 
     await expect(req1).rejects.toMatchObject({ code: 'REQUEST_CANCELLED' });
   });
+
+  it('aborts and rejects with REQUEST_TIMEOUT when execution exceeds timeoutMs without leaking PII', async () => {
+    const logs: AIExecutionLogEntry[] = [];
+    let capturedSignal: AbortSignal | undefined;
+    const runStructuredTask = vi.fn<HybridAIPort['runStructuredTask']>((input) => {
+      capturedSignal = input.signal;
+      return new Promise<StructuredAIResult>(() => {
+        // intentionally never resolves to trigger timeout
+      });
+    });
+
+    const port: HybridAIPort = {
+      inspectCapabilities: vi.fn(async () => createCapabilities('unsupported')),
+      initializeOnDeviceModel: vi.fn(),
+      runStructuredTask,
+      runCloudFollowUp: vi.fn(),
+    };
+
+    const orchestrator = new AIOrchestrator(port, (entry) => logs.push(entry));
+    await expect(
+      orchestrator.runStructuredGuidance({
+        kind: 'EXPLAIN_REQUIREMENTS',
+        locale: 'en',
+        opportunity: curatedOpportunities[0]!,
+        preference: 'ONLY_IN_CLOUD',
+        cloudConsentGranted: true,
+        capabilities: createCapabilities('unsupported'),
+        userFocusNote: 'Secret DNI 44556677 note',
+        timeoutMs: 15,
+      }),
+    ).rejects.toMatchObject({ code: 'REQUEST_TIMEOUT' });
+
+    expect(capturedSignal?.aborted).toBe(true);
+    expect(logs[0]?.outcome).toBe('error');
+    expect(JSON.stringify(logs)).not.toContain('Secret DNI 44556677');
+  });
+
+  it('enforces explicit cloud consent across PREFER_IN_CLOUD and ONLY_IN_CLOUD while preserving all 4 mode routes', async () => {
+    const runStructuredTask = vi.fn<HybridAIPort['runStructuredTask']>(async (input) => ({
+      requestId: input.requestId,
+      schemaVersion: 1 as const,
+      kind: input.kind,
+      opportunityId: input.opportunity.id,
+      sourceVersion: input.opportunity.sourceVersion,
+      summary: `Ran ${input.preference}`,
+      groundedRequirements: [],
+      suggestedActions: [],
+      unknowns: [],
+      cautionNote: 'Verify source',
+      inferenceSource: input.preference === 'ONLY_ON_DEVICE' ? 'ON_DEVICE' : 'IN_CLOUD',
+      requestedMode: input.preference,
+      modelId: 'gemini-3.5-flash-lite',
+      latencyMs: 30,
+      completedAt: new Date().toISOString(),
+    }));
+
+    const port: HybridAIPort = {
+      inspectCapabilities: vi.fn(async () => createCapabilities('downloadable')),
+      initializeOnDeviceModel: vi.fn(),
+      runStructuredTask,
+      runCloudFollowUp: vi.fn(),
+    };
+
+    const orchestrator = new AIOrchestrator(port);
+
+    await expect(
+      orchestrator.runStructuredGuidance({
+        kind: 'EXPLAIN_REQUIREMENTS',
+        locale: 'en',
+        opportunity: curatedOpportunities[0]!,
+        preference: 'PREFER_IN_CLOUD',
+        cloudConsentGranted: false,
+      }),
+    ).rejects.toMatchObject({ code: 'CLOUD_CONSENT_REQUIRED' });
+
+    await expect(
+      orchestrator.runStructuredGuidance({
+        kind: 'EXPLAIN_REQUIREMENTS',
+        locale: 'en',
+        opportunity: curatedOpportunities[0]!,
+        preference: 'ONLY_IN_CLOUD',
+        cloudConsentGranted: false,
+      }),
+    ).rejects.toMatchObject({ code: 'CLOUD_CONSENT_REQUIRED' });
+
+    await orchestrator.runStructuredGuidance({
+      kind: 'EXPLAIN_REQUIREMENTS',
+      locale: 'en',
+      opportunity: curatedOpportunities[0]!,
+      preference: 'PREFER_IN_CLOUD',
+      cloudConsentGranted: true,
+    });
+    expect(runStructuredTask).toHaveBeenLastCalledWith(
+      expect.objectContaining({ preference: 'PREFER_IN_CLOUD' }),
+    );
+
+    await orchestrator.runStructuredGuidance({
+      kind: 'EXPLAIN_REQUIREMENTS',
+      locale: 'en',
+      opportunity: curatedOpportunities[0]!,
+      preference: 'PREFER_ON_DEVICE',
+      cloudConsentGranted: true,
+    });
+    expect(runStructuredTask).toHaveBeenLastCalledWith(
+      expect.objectContaining({ preference: 'PREFER_ON_DEVICE' }),
+    );
+
+    await orchestrator.runStructuredGuidance({
+      kind: 'EXPLAIN_REQUIREMENTS',
+      locale: 'en',
+      opportunity: curatedOpportunities[0]!,
+      preference: 'ONLY_ON_DEVICE',
+      cloudConsentGranted: false,
+      capabilities: createCapabilities('available'),
+    });
+    expect(runStructuredTask).toHaveBeenLastCalledWith(
+      expect.objectContaining({ preference: 'ONLY_ON_DEVICE' }),
+    );
+  });
 });

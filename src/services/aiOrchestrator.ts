@@ -17,7 +17,8 @@ export type AIOrchestratorErrorCode =
   | 'CLOUD_CONSENT_REQUIRED'
   | 'CLOUD_CONSENT_REQUIRED_FOR_FALLBACK'
   | 'EMPTY_QUESTION'
-  | 'REQUEST_CANCELLED';
+  | 'REQUEST_CANCELLED'
+  | 'REQUEST_TIMEOUT';
 
 export class AIOrchestratorError extends Error {
   readonly code: AIOrchestratorErrorCode;
@@ -29,6 +30,9 @@ export class AIOrchestratorError extends Error {
   }
 }
 
+export const DEFAULT_STRUCTURED_TIMEOUT_MS = 45_000;
+export const DEFAULT_CLOUD_CHAT_TIMEOUT_MS = 35_000;
+
 export interface RunStructuredGuidanceRequest {
   kind: 'EXPLAIN_REQUIREMENTS' | 'PREPARE_NEXT_STEPS';
   locale: Locale;
@@ -37,6 +41,7 @@ export interface RunStructuredGuidanceRequest {
   cloudConsentGranted: boolean;
   capabilities?: AICapabilityReport | null;
   userFocusNote?: string;
+  timeoutMs?: number;
 }
 
 export interface RunCloudFollowUpRequest {
@@ -46,6 +51,51 @@ export interface RunCloudFollowUpRequest {
   history: readonly ChatTurn[];
   question: string;
   cloudConsentGranted: boolean;
+  timeoutMs?: number;
+}
+
+async function raceWithAbortAndTimeout<T>(
+  runner: () => Promise<T>,
+  controller: AbortController,
+  timeoutMs: number,
+): Promise<T> {
+  const clampedMs = Math.max(1, timeoutMs);
+  let timedOut = false;
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  let onAbort: (() => void) | undefined;
+
+  const guardPromise = new Promise<never>((_resolve, reject) => {
+    onAbort = () => {
+      if (timedOut) {
+        reject(
+          new AIOrchestratorError(
+            'REQUEST_TIMEOUT',
+            `AI request timed out after ${clampedMs}ms.`,
+          ),
+        );
+      } else {
+        reject(new AIOrchestratorError('REQUEST_CANCELLED', 'AI request was cancelled.'));
+      }
+    };
+
+    if (controller.signal.aborted) {
+      onAbort();
+      return;
+    }
+
+    controller.signal.addEventListener('abort', onAbort, { once: true });
+    timeoutId = setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, clampedMs);
+  });
+
+  try {
+    return await Promise.race([runner(), guardPromise]);
+  } finally {
+    if (timeoutId !== undefined) clearTimeout(timeoutId);
+    if (onAbort) controller.signal.removeEventListener('abort', onAbort);
+  }
 }
 
 function createRequestId(prefix: string): string {
@@ -168,17 +218,24 @@ export class AIOrchestrator {
     const fragments = buildSourceFragments(req.opportunity, req.locale);
     const startedAt = performance.now();
 
+    const timeoutMs = req.timeoutMs ?? DEFAULT_STRUCTURED_TIMEOUT_MS;
+
     try {
-      const result = await this.port.runStructuredTask({
-        requestId,
-        kind: req.kind,
-        locale: req.locale,
-        opportunity: req.opportunity,
-        fragments,
-        preference: effectivePreference,
-        userFocusNote: req.userFocusNote,
-        signal: controller.signal,
-      });
+      const result = await raceWithAbortAndTimeout(
+        () =>
+          this.port.runStructuredTask({
+            requestId,
+            kind: req.kind,
+            locale: req.locale,
+            opportunity: req.opportunity,
+            fragments,
+            preference: effectivePreference,
+            userFocusNote: req.userFocusNote,
+            signal: controller.signal,
+          }),
+        controller,
+        timeoutMs,
+      );
 
       if (
         controller.signal.aborted ||
@@ -212,14 +269,14 @@ export class AIOrchestrator {
 
       return result;
     } catch (err) {
-      if (err instanceof AIOrchestratorError && err.code === 'REQUEST_CANCELLED') {
-        throw err;
-      }
+      const isTimeout =
+        err instanceof AIOrchestratorError && err.code === 'REQUEST_TIMEOUT';
       const isCancelled =
-        controller.signal.aborted ||
-        (err instanceof Error &&
-          (err.name === 'AbortError' ||
-            (err as { code?: string }).code === 'REQUEST_CANCELLED'));
+        !isTimeout &&
+        (controller.signal.aborted ||
+          (err instanceof Error &&
+            (err.name === 'AbortError' ||
+              (err as { code?: string }).code === 'REQUEST_CANCELLED')));
       const outcome = isCancelled
         ? 'cancelled'
         : err instanceof Error &&
@@ -237,6 +294,10 @@ export class AIOrchestrator {
         timestamp: new Date().toISOString(),
         note: err instanceof Error ? sanitizePlainText(err.message, 120) : undefined,
       });
+
+      if (isCancelled && !(err instanceof AIOrchestratorError)) {
+        throw new AIOrchestratorError('REQUEST_CANCELLED', 'AI request was cancelled.');
+      }
 
       throw err;
     } finally {
@@ -285,18 +346,25 @@ export class AIOrchestrator {
 
     const startedAt = performance.now();
 
+    const timeoutMs = req.timeoutMs ?? DEFAULT_CLOUD_CHAT_TIMEOUT_MS;
+
     try {
-      const result = await this.port.runCloudFollowUp({
-        requestId,
-        locale: req.locale,
-        opportunity: req.opportunity,
-        comparedOpportunity: req.comparedOpportunity,
-        fragments,
-        comparedFragments,
-        history: req.history,
-        question: cleanQuestion,
-        signal: controller.signal,
-      });
+      const result = await raceWithAbortAndTimeout(
+        () =>
+          this.port.runCloudFollowUp({
+            requestId,
+            locale: req.locale,
+            opportunity: req.opportunity,
+            comparedOpportunity: req.comparedOpportunity,
+            fragments,
+            comparedFragments,
+            history: req.history,
+            question: cleanQuestion,
+            signal: controller.signal,
+          }),
+        controller,
+        timeoutMs,
+      );
 
       if (controller.signal.aborted || this.latestChatRequestId !== requestId) {
         this.emitLog({
@@ -327,14 +395,14 @@ export class AIOrchestrator {
 
       return result;
     } catch (err) {
-      if (err instanceof AIOrchestratorError && err.code === 'REQUEST_CANCELLED') {
-        throw err;
-      }
+      const isTimeout =
+        err instanceof AIOrchestratorError && err.code === 'REQUEST_TIMEOUT';
       const isCancelled =
-        controller.signal.aborted ||
-        (err instanceof Error &&
-          (err.name === 'AbortError' ||
-            (err as { code?: string }).code === 'REQUEST_CANCELLED'));
+        !isTimeout &&
+        (controller.signal.aborted ||
+          (err instanceof Error &&
+            (err.name === 'AbortError' ||
+              (err as { code?: string }).code === 'REQUEST_CANCELLED')));
 
       this.emitLog({
         requestId,
@@ -346,6 +414,10 @@ export class AIOrchestrator {
         timestamp: new Date().toISOString(),
         note: err instanceof Error ? sanitizePlainText(err.message, 120) : undefined,
       });
+
+      if (isCancelled && !(err instanceof AIOrchestratorError)) {
+        throw new AIOrchestratorError('REQUEST_CANCELLED', 'Superseded by a newer question.');
+      }
 
       throw err;
     } finally {

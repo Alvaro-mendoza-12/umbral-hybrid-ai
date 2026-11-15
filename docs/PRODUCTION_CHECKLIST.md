@@ -1,0 +1,26 @@
+# Production & Pre-Submission Checklist — UMBRAL Hybrid AI
+
+Clean boundary between completed engineering/infrastructure verification and final owner actions requiring eligible desktop hardware, deployment authorization, or Devpost account submission.
+
+---
+
+## A. Engineering & QA Gates Completed
+
+- [x] **Original Kiroween repository untouched:** `Alvaro-mendoza-12/Umbral` (`https://umbral-seven-khaki.vercel.app`) remains completely isolated and unmodified.
+- [x] **Product UX/UI & first-impression redesign (`/` -> Detail -> My Route -> Settings -> Privacy -> 404):** Hero value proposition, 3-step visual overview, non-blocking `OnboardingTour` anchored cleanly away from hero CTAs, sliding segmented `ES / EN` `LanguageSwitch` with mobile right-edge stability, subtle `prefers-reduced-motion`-safe staggered transitions, clean Detail bullets without raw internal IDs, 4-state `.match-scoreboard`, dual-engine `.ai-engine-strip`, `.route-kpi-grid`, and localized 404 card.
+- [x] **All 20 opportunities audited (`CURATED_CATALOG_VERSION = '2026.11.14-r1'`):** Direct official HTTPS URLs verified `HTTP 200` on `2026-11-14` for all 4 `review_required` listings (`pe-promigas-billing`, `pe-xylem-electromechanical`, `co-aws-intern`, `es-cybersecurity-94`), retaining `editorialStatus: 'review_required'` honestly (excluded by default when `!includeClosed` and gated behind warning/pending badges).
+- [x] **Deterministic 4-state matcher verified:** `MATCH`, `MISMATCH`, `NEEDS_CONFIRMATION`, `UNKNOWN` + mandatory/optional badges + contradiction alerts + informational orientation-only disclaimer.
+- [x] **Firebase AI Logic hybrid architecture:** All 4 inference modes (`PREFER_ON_DEVICE`, `ONLY_ON_DEVICE`, `PREFER_IN_CLOUD`, `ONLY_IN_CLOUD`), explicit Cloud Consent Gate blocking silent fallback, early `ONLY_ON_DEVICE` availability guard + offline `HybridReadinessPill` guard, request timeouts/cancellation cleanup, download error UI, multi-turn `startChat`, and strict provenance badges derived exclusively from `inferenceSource`.
+- [x] **Security & privacy controls:** Matching CSP headers across `firebase.json` & `vercel.json` (`worker-src 'self'`, `manifest-src 'self'`, strict `connect-src`/`script-src`/`frame-src`), App Check `ReCaptchaEnterpriseProvider` with `useLimitedUseAppCheckTokens: true`, production debug suppression (`!import.meta.env.PROD`), strict HTTPS validation on imported backups, zero unsafe DOM sinks, zero private secrets in repo/`dist/`, and `npm audit --omit=dev` `@grpc/grpc-js` (`~1.9.0` locked by `@firebase/firestore@4.20.0`) proven absent from browser chunks (`dist/assets/*.js`).
+- [x] **Offline & focus workspace (`My Route`):** 1-goal / 3-active-step cognitive guardrails, Markdown & JSON export, schema-validated JSON import (`512 KB` limit), `workbox.navigateFallback: '/index.html'`, and offline E2E `/route` reload verified.
+- [x] **Full automated quality suite green (verified on Release Candidate code):** Strict TypeScript (`tsc --noEmit`), ESLint 10 (`eslint .`), Vitest (`10` test files, `51` tests), Vite + PWA build (`22` precache entries), and Playwright + Axe WCAG 2.2 AA E2E suite (`21` tests across `8` viewports + isolated `dist-e2e.local` blank-credentials suite).
+
+---
+
+## B. Infrastructure Status & Owner Actions Before Devpost Submission (Before Nov 30, 2026 · 14:00 PST)
+
+- [x] **Firebase project `umbral-21e8b` & Vercel `umbral-hybrid-ai` configured and synced:** Gemini Developer API active, Spark plan (no billing enabled), App Check configured with reCAPTCHA Enterprise (`useLimitedUseAppCheckTokens: true`) for `umbral-21e8b.web.app`, `umbral-21e8b.firebaseapp.com`, and `umbral-hybrid-ai.vercel.app`, live `IN_CLOUD` (`State D`, `gemini-3.5-flash-lite`) verified.
+- [ ] **1. Run Real Hardware Gemini Nano Verification (`ON_DEVICE`):** Follow [docs/GEMINI_NANO_SETUP.md](GEMINI_NANO_SETUP.md) on Chrome Desktop `157+` with eligible GPU/disk hardware (`>= 6–8 GB` VRAM / Apple Silicon `>= 16 GB` and `>= 25 GB` free disk on BOTH Chrome User Data & `%TEMP%`) to verify offline `inferenceSource === 'ON_DEVICE'` and `/settings` **`State E`**. *(Current `RTX 3050 4 GB` laptop Chrome 157 downloaded `2,360.73 MiB` `gemma4_cpu_model` on `D:` and reached `"available"`, then crashed in `OnDeviceModelService` with `ServiceCrash` / `Enough VRAM: false (0 MiB actual, 3000 MiB required)`.)*
+- [x] **2. Public Repository, Canonical `Apache-2.0` License & Hardened Production Deploys:** Repository pushed cleanly on `feat/hybrid-ai-web`, `LICENSE` matches canonical SPDX `Apache-2.0`, and both Firebase Hosting & Vercel serve the hardened build (`useLimitedUseAppCheckTokens: true`) with live `IN_CLOUD` + zero silent fallback verified.
+- [ ] **3. Optional Live Email Re-Check on `review_required` Entries:** While official pages for all 4 `review_required` entries returned `HTTP 200` on audit, keep them behind pending badges unless confirmed directly with Promigas/Xylem HR or ALMERIMATIK/Amazon.
+- [ ] **4. Final Video Recording & Devpost Submission:** Record the `<= 3 min` YouTube video showing real offline `ON_DEVICE` (`Ran on-device · Chrome Gemini Nano`) + live `IN_CLOUD` on compatible hardware per [docs/DEVPOST_SUBMISSION.md](DEVPOST_SUBMISSION.md), then submit before **November 30, 2026 at 2:00 PM PST**.

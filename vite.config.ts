@@ -4,6 +4,10 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
+  server: {
+    host: '127.0.0.1',
+    port: 5173,
+  },
   plugins: [
     react(),
     VitePWA({
@@ -29,6 +33,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,json,woff2}'],
+        navigateFallback: '/index.html',
         runtimeCaching: [],
       },
     }),

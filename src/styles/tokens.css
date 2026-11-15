@@ -1,25 +1,46 @@
+/* Self-hosted variable fonts (latin subset) — no third-party requests, CSP font-src 'self' */
+@font-face {
+  font-family: 'Fraunces Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('../../node_modules/@fontsource-variable/fraunces/files/fraunces-latin-wght-normal.woff2') format('woff2-variations');
+}
+
+@font-face {
+  font-family: 'Plus Jakarta Sans Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 800;
+  src: url('../../node_modules/@fontsource-variable/plus-jakarta-sans/files/plus-jakarta-sans-latin-wght-normal.woff2') format('woff2-variations');
+}
+
 :root {
   /* Civic-Editorial Surface & Ink Palette */
-  --bg-canvas: #f6f7f5;
+  --bg-canvas: #f5f6f2;
   --bg-paper: #ffffff;
-  --bg-subtle: #edf1ee;
+  --bg-subtle: #ecefe9;
   --bg-elevated: #ffffff;
 
-  --ink-primary: #13201b;
-  --ink-secondary: #374841;
-  --ink-muted: #51625b;
+  --ink-primary: #12211c;
+  --ink-secondary: #354841;
+  --ink-muted: #4f635b;
 
   /* Threshold Emerald & Civic Highlight */
   --brand-primary: #0f4c3a;
   --brand-primary-hover: #0a382a;
   --brand-on-primary: #ffffff;
   --brand-soft: #e4f0ea;
+  --brand-soft-border: #b8d3c5;
   --brand-accent: #d9ed6f;
 
   /* Accessible Focus & Borders */
   --focus-ring: #1d4ed8;
   --border-subtle: #d5ded9;
   --border-strong: #9fb0a8;
+
+  /* Motion */
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
 
   /* Semantic Status Colors (never used without label/icon) */
   --status-good-bg: #e6f4ec;
@@ -45,9 +66,26 @@
   --cloud-bg: #ebf0ff;
   --cloud-fg: #1e3a8a;
   --cloud-border: #b3c4fa;
+  /* Category identity (Cartografía Cívica) — always paired with icon + text */
+  --cat-education-fg: #1e40af;
+  --cat-education-bg: #eff6ff;
+  --cat-education-border: #bfdbfe;
+  --cat-employment-fg: #0f4c3a;
+  --cat-employment-bg: #e6f4ec;
+  --cat-employment-border: #a7d7be;
+  --cat-training-fg: #92400e;
+  --cat-training-bg: #fef3c7;
+  --cat-training-border: #fcd34d;
+  --cat-entrepreneurship-fg: #5b21b6;
+  --cat-entrepreneurship-bg: #f3e8ff;
+  --cat-entrepreneurship-border: #ddd6fe;
+  --cat-civic-fg: #0f766e;
+  --cat-civic-bg: #ccfbf1;
+  --cat-civic-border: #99f6e4;
 
   /* Typography */
-  --font-sans: 'Segoe UI Variable', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: 'Plus Jakarta Sans Variable', 'Segoe UI Variable', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Fraunces Variable', Georgia, 'Times New Roman', serif;
   --font-mono: ui-monospace, 'Cascadia Mono', 'Segoe UI Mono', Consolas, monospace;
 
   /* Scale & Radii */
@@ -64,3 +102,4 @@
   --header-height: 64px;
   --mobile-nav-height: 68px;
 }
+

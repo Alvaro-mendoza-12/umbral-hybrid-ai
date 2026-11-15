@@ -3,12 +3,14 @@ import {
   Download,
   RefreshCw,
   RotateCcw,
+  ShieldCheck,
   Trash2,
 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useApp } from '../../app/appContextStore';
+import { LanguageSwitch } from '../../components/LanguageSwitch';
 import type { HybridInferencePreference } from '../../domain/types';
 
 const MODES: readonly HybridInferencePreference[] = [
@@ -27,6 +29,8 @@ export function SettingsPage() {
     capabilitiesLoading,
     clearAiLog,
     clearAllData,
+    clearDownloadError,
+    downloadError,
     downloadProgress,
     initializeOnDeviceModel,
     isDownloadingModel,
@@ -36,7 +40,6 @@ export function SettingsPage() {
     replayIntro,
     setCloudConsent,
     setInferencePreference,
-    setLocale,
     startTour,
   } = useApp();
 
@@ -44,9 +47,22 @@ export function SettingsPage() {
   const [clearedNotice, setClearedNotice] = useState(false);
 
   const avail = capabilities?.onDeviceAvailability ?? 'unsupported';
+  const hasConfirmedCloudSuccess = aiLog.some(
+    (entry) => entry.outcome === 'success' && entry.inferenceSource === 'IN_CLOUD',
+  );
+  const hasConfirmedLocalSuccess = aiLog.some(
+    (entry) => entry.outcome === 'success' && entry.inferenceSource === 'ON_DEVICE',
+  );
+  const cloudVerificationStateKey = !capabilities?.firebaseConfigured
+    ? 'STATE_A'
+    : !capabilities?.appCheckConfigured
+      ? 'STATE_B'
+      : hasConfirmedCloudSuccess
+        ? 'STATE_D'
+        : 'STATE_C';
 
   return (
-    <div className="stack-lg">
+    <div className="stack-lg animate-enter">
       <section className="surface-card stack-sm">
         <h1 style={{ margin: 0, fontSize: 'clamp(1.38rem, 2.4vw, 1.85rem)' }}>
           {t('settings.heading')}
@@ -56,28 +72,60 @@ export function SettingsPage() {
         </p>
       </section>
 
+      <section className="surface-card stack-sm" aria-labelledby="settings-privacy-heading">
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: '12px',
+            flexWrap: 'wrap',
+          }}
+        >
+          <div className="stack-sm" style={{ gap: '4px', maxWidth: '58ch' }}>
+            <h2
+              id="settings-privacy-heading"
+              style={{ margin: 0, fontSize: '1.12rem', display: 'flex', alignItems: 'center', gap: '8px' }}
+            >
+              <ShieldCheck size={18} aria-hidden="true" />
+              <span>{t('settings.privacySummaryTitle')}</span>
+            </h2>
+            <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--ink-secondary)' }}>
+              {t('settings.privacySummaryBody')}
+            </p>
+          </div>
+          <Link to="/privacy" className="btn btn-secondary btn-sm">
+            <ShieldCheck size={15} aria-hidden="true" />
+            <span>{t('settings.privacyViewLink')}</span>
+          </Link>
+        </div>
+      </section>
+
       <section className="surface-card stack-sm" aria-labelledby="settings-lang-heading">
-        <h2 id="settings-lang-heading" style={{ margin: 0, fontSize: '1.12rem' }}>
-          {t('settings.languageSection')}
-        </h2>
-        <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--ink-secondary)' }}>
-          {t('settings.languageHint')}
-        </p>
-        <div className="card-actions">
-          <button
-            type="button"
-            className={locale === 'en' ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm'}
-            onClick={() => setLocale('en')}
-          >
-            English (EN)
-          </button>
-          <button
-            type="button"
-            className={locale === 'es' ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm'}
-            onClick={() => setLocale('es')}
-          >
-            Español (ES)
-          </button>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: '12px',
+            flexWrap: 'wrap',
+          }}
+        >
+          <div className="stack-sm" style={{ gap: '4px' }}>
+            <h2 id="settings-lang-heading" style={{ margin: 0, fontSize: '1.12rem' }}>
+              {t('settings.languageSection')}
+            </h2>
+            <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--ink-secondary)' }}>
+              {t('settings.languageHint')}
+            </p>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+            <span className="pill pill-neutral">
+              {t('settings.activeLanguageLabel')}:{' '}
+              {locale === 'es' ? 'Español (ES)' : 'English (EN)'}
+            </span>
+            <LanguageSwitch testId="settings-lang-switch" />
+          </div>
         </div>
       </section>
 
@@ -141,7 +189,12 @@ export function SettingsPage() {
         </label>
       </section>
 
-      <section className="surface-card stack-md" aria-labelledby="settings-diag-heading">
+      <details className="surface-card disclosure" data-testid="tech-diagnostics-disclosure">
+        <summary className="disclosure-summary" data-testid="tech-diagnostics-summary">
+          <span>{t('settings.techDiagnosticsToggle')}</span>
+        </summary>
+        <div className="disclosure-body stack-lg" style={{ paddingTop: '14px' }}>
+          <section className="subtle-card stack-md" aria-labelledby="settings-diag-heading">
         <div
           style={{
             display: 'flex',
@@ -209,7 +262,9 @@ export function SettingsPage() {
             </dt>
             <dd style={{ margin: 0, fontWeight: 600 }}>
               {capabilities?.firebaseConfigured
-                ? t('settings.configured')
+                ? capabilities.firebaseProjectId
+                  ? `${t('settings.configured')} (${capabilities.firebaseProjectId})`
+                  : t('settings.configured')
                 : t('settings.notConfigured')}
             </dd>
           </div>
@@ -229,6 +284,21 @@ export function SettingsPage() {
             </dt>
             <dd style={{ margin: 0, fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
               {capabilities?.cloudModelId ?? 'gemini-3.5-flash-lite'}
+            </dd>
+          </div>
+
+          <div
+            className="subtle-card stack-sm"
+            style={{ gap: '2px', gridColumn: '1 / -1' }}
+          >
+            <dt style={{ fontSize: '0.8rem', color: 'var(--ink-muted)' }}>
+              {t('settings.diagVerificationState')}
+            </dt>
+            <dd className="stack-sm" style={{ margin: 0, fontWeight: 600, gap: '4px' }}>
+              <span>{t(`settings.verificationStates.${cloudVerificationStateKey}`)}</span>
+              {avail === 'available' && hasConfirmedLocalSuccess && (
+                <span>{t('settings.verificationStates.STATE_E')}</span>
+              )}
             </dd>
           </div>
         </dl>
@@ -253,12 +323,34 @@ export function SettingsPage() {
           </div>
         )}
 
-        {isDownloadingModel && (
-          <progress max={1} value={downloadProgress ?? 0} style={{ width: '100%' }} />
+        {(isDownloadingModel || avail === 'downloading') && (
+          <progress
+            max={1}
+            value={isDownloadingModel ? (downloadProgress ?? 0) : undefined}
+            style={{ width: '100%' }}
+          />
+        )}
+
+        {downloadError && (
+          <div className="banner banner-bad" role="alert">
+            <span>
+              {t(`ai.errors.${downloadError.code}`, {
+                defaultValue: downloadError.details,
+                details: downloadError.details,
+              })}
+            </span>
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              onClick={clearDownloadError}
+            >
+              <span>{t('common.close')}</span>
+            </button>
+          </div>
         )}
       </section>
 
-      <section className="surface-card stack-md" aria-labelledby="settings-audit-heading">
+      <section className="subtle-card stack-md" aria-labelledby="settings-audit-heading">
         <div
           style={{
             display: 'flex',
@@ -309,7 +401,7 @@ export function SettingsPage() {
                   }}
                 >
                   <strong>
-                    {entry.kind} · {entry.inferenceSource}
+                    {entry.kind} · {entry.requestedMode} → {entry.inferenceSource}
                   </strong>
                   <span style={{ color: 'var(--ink-muted)' }}>
                     {entry.outcome} · {entry.latencyMs} ms
@@ -324,7 +416,9 @@ export function SettingsPage() {
             ))}
           </ul>
         )}
-      </section>
+          </section>
+        </div>
+      </details>
 
       <section className="surface-card stack-sm" aria-labelledby="settings-exp-heading">
         <h2 id="settings-exp-heading" style={{ margin: 0, fontSize: '1.12rem' }}>

@@ -13,6 +13,7 @@ export interface AICapabilityReport {
   browserSupportsPromptApi: boolean;
   onDeviceAvailability: OnDeviceAvailability;
   firebaseConfigured: boolean;
+  firebaseProjectId?: string;
   appCheckConfigured: boolean;
   appCheckMode: 'recaptcha_enterprise' | 'debug' | 'unconfigured';
   cloudModelId: string;

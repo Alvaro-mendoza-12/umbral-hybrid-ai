@@ -1,129 +1,133 @@
-# UMBRAL HYBRID AI · Sistema UX/UI
+# Sistema de Diseño UX/UI: UMBRAL («Cartografía Cívica»)
 
-Estado: especificación propuesta, no interfaz implementada ni validada con usuarios. Fecha: 2026-11-12. Los valores visuales siguientes son decisiones de diseño del nuevo producto; no se afirma que sean colores heredados del original.
+**Propósito:** Dotar a UMBRAL de una identidad visual humana, luminosa, diferenciable y mobile-first que rompa el aspecto actual de «bloques SaaS grises uniformes» (`tokens.css` y `layout.css` vigentes), aplicando los principios de dirección autoral de `frontend-design` y las reglas prácticas de `web-design-guidelines`.
 
-## 1. Dirección y alternativas
+---
 
-Se compararon tres modelos: catálogo con muchas tarjetas (fácil de construir, difícil priorización), conversación como pantalla principal (flexible pero oculta acciones y depende de prompts), y espacio orientado a una próxima acción. Se recomienda el tercero: una lista editorial de oportunidades, explicación contextual y una ruta personal. La IA está detrás de acciones explícitas, no de una caja de chat vacía.
+## 1. Dirección visual y referentes funcionales (sin copiar plantillas)
 
-La promesa visual es «claridad para dar tu siguiente paso», no una estética de terminal ni un panel de indicadores. Una pantalla responde a una pregunta principal. El producto no promete empleo, admisión o financiamiento. «Verificada» significa revisión editorial de origen y vigencia, nunca garantía del resultado.
+### Personalidad de marca: **«Claridad de Umbral» (Editorial Cívico Humano)**
+UMBRAL no es un tablero financiero ni una app de redes sociales; es un **mapa confiable que aclara el camino antes de dar el paso**. Su estética combina:
+- La **limpieza editorial y tipográfica** de servicios públicos de referencia mundial (*GOV.UK Design System* en jerarquía de requisitos y honestidad textual).
+- La **diferenciación escaneable por códigos visuales** de buscadores curados modernos (*Roadmap.sh*, *Linear* en estados nítidos, *Stripe Docs* en divulgación progresiva sin saturar).
+- La **calidez orgánica** heredada del verde umbral (`#0F4C3A`), enriquecida con papel marfil luminoso y acentos cromáticos estrictamente funcionales según categoría y fuente de inferencia.
 
-## 2. Estructura de la experiencia
+### Lo que evitamos explícitamente (antipatrones del código actual)
+- **Tarjetas clónicas (`SaaS-card kit`):** no todas las secciones deben llevar `border-radius: 16px` idéntico sobre `#F6F7F5`. Separamos claramente **bandas de contexto** (sin borde grueso, sobre lienzo), **tarjetas interactivas de oportunidad** (borde lateral + elevación al foco/hover) y **módulos de trabajo** (autocomprobación y checklist).
+- **Eyebrows en mayúsculas repetidos en cada caja y guiones largos decorativos.**
+- **Transiciones CSS genéricas `transition: all`** (sustituir por transiciones explícitas de `transform` y `opacity` únicamente).
 
-- **Explorar:** objetivo activo, país/alcance geográfico, lista de resultados y filtros. Arranque útil sin cuenta. No carrusel de categorías ni muro de tarjetas.
-- **Detalle:** título, entidad, localización/modalidad, fecha límite y zona, requisitos esenciales, fuente y fecha de revisión. Acciones: «Guardar en Mi Ruta», «Entender requisitos», «Ver convocatoria oficial».
-- **Mi Ruta:** oportunidades guardadas, un objetivo activo y hasta tres tareas activas globales editables, que pueden vincularse a oportunidades. No gamificación de ansiedad ni rachas.
-- **Perfil:** idioma, país de interés y objetivo voluntario. No pedir documento de identidad, CV completo, ingresos, salud o fecha de nacimiento para explorar.
-- **Asistente contextual:** panel de tarea junto al detalle en escritorio; vista completa en móvil. Devuelve resumen, requisitos explícitos y puntos no confirmados. No acumula una conversación como producto principal.
+---
 
-## 3. Tokens propuestos
+## 2. Sistema cromático con propósito y contraste WCAG 2.2 AA verificado
 
-| Token | Valor propuesto | Regla |
-|---|---|---|
-| `color.canvas` | `#F7F8FA` | Fondo general claro |
-| `color.surface` | `#FFFFFF` | Superficies, campos |
-| `color.text` | `#172033` | Texto principal |
-| `color.textMuted` | `#475569` | Secundario; nunca menor contraste por opacidad |
-| `color.primary` | `#174C3C` | Acción principal, texto blanco |
-| `color.primarySoft` | `#E4F0E9` | Selección con icono/etiqueta además del color |
-| `color.accent` | `#D5EA77` | Identidad decorativa, texto oscuro; no texto sobre blanco |
-| `color.error` | `#A82222` | Error con mensaje e icono |
-| `color.focus` | `#1D4ED8` | Anillo visible de 3 px con separación |
-| `radius` | 8 / 12 / 20 px | Campos / paneles / contenedores destacados |
-| `space` | 4, 8, 12, 16, 24, 32, 48, 64 px | Sin valores arbitrarios salvo ajustes ópticos documentados |
-| `type` | Sistema, fallback sans-serif | Evitar descarga tipográfica bloqueante |
-| `fontSize` | 14, 16, 18, 24, 32, 40 px | Cuerpo 16; auxiliares 14 mínimo propuesto |
-| `lineHeight` | 1.5 cuerpo / 1.15 títulos | Respetar ajustes del navegador |
-| `measure` | 65 caracteres | Límite orientativo de párrafo |
-| `motion` | 120 / 180 / 240 ms | Interacciones, paneles, navegación |
+### 2.1. Lienzos, superficies y tintas base
 
-Estos pares deben comprobarse sobre la interfaz real antes de aceptación; no se declara conformidad por definir una paleta. No introducir modo oscuro en el MVP si duplica la matriz de pruebas sin aportar evidencia de necesidad.
+| Token propuesto | HEX | Uso funcional | Contraste mínimo requerido |
+| --- | --- | --- | --- |
+| `--bg-canvas` | `#F5F6F2` | Fondo papel piedra muy suave (fatiga visual baja) | — |
+| `--bg-paper` | `#FFFFFF` | Tarjetas principales, ficha, inputs | — |
+| `--bg-subtle` | `#ECEFE9` | Bloques secundarios, barras resumen colapsadas | — |
+| `--ink-primary` | `#12211C` | Títulos, datos clave, texto principal | `> 15:1` sobre blanco y canvas |
+| `--ink-secondary` | `#354841` | Descripciones y cuerpo secundario | `> 8.5:1` sobre blanco y canvas |
+| `--ink-muted` | `#4F635B` | Metadatos de fecha y origen | `>= 5.8:1` sobre blanco (cumple AA `4.5:1`) |
+| `--brand-primary` | `#0F4C3A` | Acción principal (Explorar, Postular, Guardar) | `> 9.8:1` con texto `#FFFFFF` |
+| `--brand-primary-hover` | `#0A382A` | Estado hover/active de CTA primario | `> 12.5:1` con texto `#FFFFFF` |
+| `--focus-ring` | `#1D4ED8` | Anillo `:focus-visible` `3px` con `offset: 2px` | `> 3:1` frente a fondo adyacente |
 
-## 4. Componentes y estados
+### 2.2. Identidad cromática funcional por categoría de oportunidad (Resuelve `H-05`)
+Cada tarjeta y ficha lleva una **barra o insignia lateral + ícono propio de categoría** para reconocimiento en `< 0.5 s` (siempre acompañado de etiqueta de texto para no depender solo del color):
 
-**OpportunityRow:** organización, título, categoría, modalidad/localización, fecha límite y estado editorial. Máximo dos líneas para descripción; título puede crecer sin cortar información crítica. Área de enlace definida, guardar como botón separado; no botones anidados en enlaces.
+| Categoría | Icono Lucide | Color Acento (`fg`) | Fondo Pill (`bg`) | Borde (`border`) |
+| --- | --- | --- | --- | --- |
+| **Educación y becas** (`education`) | `GraduationCap` | `#1E40AF` (Azul académico) | `#EFF6FF` | `#BFDBFE` |
+| **Empleo y prácticas** (`employment`) | `Briefcase` | `#0F4C3A` (Esmeralda profesional) | `#E6F4EC` | `#A7D7BE` |
+| **Formación y cursos** (`training`) | `BookOpenCheck` | `#92400E` (Ámbar oficio) | `#FEF3C7` | `#FCD34D` |
+| **Emprendimiento y fondos** (`entrepreneurship`) | `Rocket` | `#5B21B6` (Violeta proyecto) | `#F3E8FF` | `#DDD6FE` |
+| **Participación / Cívico** (`civic`) | `Landmark` | `#0F766E` (Turquesa público) | `#CCFBF1` | `#99F6E4` |
 
-**PrimaryAction:** etiqueta con verbo y objeto; un estilo primario por contexto. Área interactiva objetivo 44 × 44 px o mayor. Estados normal, hover, foco, activo, ocupado y deshabilitado. Una acción deshabilitada explica el requisito faltante cerca de ella.
+### 2.3. Semáforo de Elegibilidad y Origen de IA (Siempre Icono + Texto + Color)
 
-**FilterBar:** dos filtros frecuentes visibles (tipo, país) y «Más filtros». Aplicar y limpiar explícitos en móvil. Persistir selección al volver del detalle. Chips removibles con nombre accesible, no solo una x.
+| Estado | Uso | Fondo / Tinta / Borde |
+| --- | --- | --- |
+| **Coincide (`MATCH`)** | Cumples este requisito | `#E6F4EC` / `#0D5434` / `#86C7A7` + Icono `CheckCircle2` |
+| **No coincide (`MISMATCH`)** | Bloqueo probable detectado | `#FDECEC` / `#8E1B1B` / `#E5A1A1` + Icono `XCircle` |
+| **Por confirmar (`NEEDS_CONFIRMATION`)** | Requiere certificado o revisión externa | `#FDF4DB` / `#754C00` / `#E0B85A` + Icono `AlertTriangle` |
+| **Falta tu dato (`UNKNOWN`)** | Aún no completaste ese campo en tu perfil | `#EEF1EF` / `#3B4A44` / `#C4CEC9` + Icono `HelpCircle` |
+| **IA Local (`ON_DEVICE`)** | Ejecutado en navegador (Gemini Nano) | `#E6F4EC` / `#0D5434` / `#9FD4B8` + Icono `Cpu` |
+| **IA Nube (`IN_CLOUD`)** | Ejecutado en Firebase con consentimiento | `#EBF0FF` / `#1E3A8A` / `#B3C4FA` + Icono `Cloud` |
 
-**AIResult:** título de tarea, modo realmente observado («En este dispositivo», «En la nube» o «Origen no confirmado»), fecha, fuentes de contenido, incertidumbres y acciones. Separar fuente del contenido de lugar de ejecución. La UI no puede inferir el origen a partir del modo solicitado. «Reintentar» no borra la información previa útil.
+---
 
-**SourceEvidence:** enlace oficial, revisión editorial y estado. Si falta un dato, mostrar «No informado por la fuente». No completar con IA salarios, fechas, elegibilidad ni condiciones que no estén documentadas.
+## 3. Tipografía, escala y ritmo de lectura
 
-**Task:** acción, fecha voluntaria y estado pendiente/en curso/completada. El seguimiento de cada oportunidad tiene estado independiente: guardada/preparando/enviada/cerrada. Deshacer tras completar o quitar. «Abrir fuente» nunca equivale a «Postulación enviada».
+- **Par tipográfico propuesto (distintivo y cargable sin bloquear la app offline):**
+  - **Titulares de página, nombres de convocatoria y cifras de beneficio:** `'Fraunces', Georgia, serif` o `'Newsreader', Georgia, serif` (en peso `600`, `line-height: 1.15`, `text-wrap: balance`). Aporta autoridad cívico-editorial y rompe por completo el aspecto frío de formulario. *Nota de rendimiento PWA:* autohospedar un único subconjunto `.woff2` (`latin`/`latin-ext`, `~30 KB`) con `font-display: swap` para no depender de internet ni violar la CSP `font-src 'self'`.
+  - **Interfaz, etiquetas, botones, requisitos y controles:** `'Plus Jakarta Sans', 'Segoe UI Variable', system-ui, sans-serif` (`font-variant-numeric: tabular-nums` en plazos, días restantes y contadores).
+- **Escala tipográfica (base `16px`, nunca inferior a `13px`):**
+  - `Display / H1` (Hero / Ficha): `clamp(1.38rem, 2.5vw, 1.95rem)`
+  - `H2` (Títulos de tarjeta y secciones): `1.125rem` (`18px`)
+  - `Body` (Descripciones y requisitos): `0.95rem` – `1rem` (`15–16px`, ancho máximo `65ch`, `line-height: 1.55`)
+  - `Meta / Badge`: `0.8125rem` (`13px`)
+- **Escala de espaciado (múltiplos de `4px`):** `4, 8, 12, 16, 20, 24, 32, 48`.
 
-Estados mínimos por vista: cargando, lista útil, vacío inicial, sin coincidencias, sin conexión, fallo recuperable, contenido desactualizado, acceso restringido. El catálogo sigue siendo útil si la IA falla. Sin conexión se muestra fecha de caché; no se simula una actualización.
+---
 
-## 5. Responsive y reflow
+## 4. Sistema de componentes clave
 
-| Ancho CSS | Composición | Comportamiento |
-|---|---|---|
-| 320 | Una columna, margen 16 | Navegación inferior Explorar/Mi Ruta; ajustes en cabecera; filtros en panel; títulos multilínea |
-| 360 / 390 | Una columna, margen 16–20 | Lista, detalle y explicación como vistas separadas |
-| 768 | Una columna principal amplia, margen 24 | Barra superior; panel de filtros lateral solo si cabe |
-| 1024 | Navegación + contenido | Detalle y explicación pueden dividirse sin estrechar lectura |
-| 1280 / 1440 | Contenedor máximo 1200, margen automático | Dos áreas, nunca estirar párrafos para llenar pantalla |
-| >1440 | Mismo máximo de lectura | Espacio respirable, no añadir más tarjetas |
+### 4.1. Tarjeta de Oportunidad (`OpportunityRow`)
+- **Anatomía en máximo 5 zonas visuales claras:**
+  1. **Fila superior de contexto:** `[Badge Categoría con color/icono]` + `[Estado y cuenta regresiva: Quedan 16 d]` + `[Entidad · País/Ciudad]` (sin desbordes).
+  2. **Título enlazable limpio** (`text-wrap: balance`, área clickeable clara; nunca anidar botones dentro del `<Link>`).
+  3. **Dato de valor en negrita suave:** *«Beneficio: Exención de matrícula + CHF 13.500/semestre»*.
+  4. **Mini-medidor de encaje (`Match Meter`)** *(solo si el usuario ya completó >=1 campo de su perfil, o etiqueta «Comprobar encaje» si aún está en 0/6)*: barra segmentada compacta de requisitos (`2 cumple · 1 por confirmar`) en una sola línea.
+  5. **Acciones en la base:** CTA primario claro (`Ver requisitos y aplicar` o `Revisar ficha`) + Botón secundario discreto (`Guardar` / `Guardada` con `aria-pressed`).
 
-La condición real es espacio disponible, no detección por dispositivo. En horizontal con altura reducida, navegación compacta y diálogos con scroll interno accesible. Aplicar `min-width:0`, envoltura de textos/URLs, áreas de scroll explícitas y respeto a safe-area. No ocultar acciones esenciales por media query. A 200 % de zoom no superponer cabeceras, tooltips ni banners; probar reflow de 320 CSS px y 400 % cuando corresponda a WCAG, además de los 200 % pedidos. No bloquear orientación.
+### 4.2. Bloque Único de Requisitos + Semáforo (`UnifiedRequirementsCheck`)
+- **Cabecera integrada:** *«¿Cumples los requisitos? (4 en total)»* + Píldora del perfil activo (`Perú · Técnico · EN · Editar 4/6`).
+- **Marcador horizontal (`Match Scoreboard`)** con 4 chips interactivos que además **sirven de filtro rápido dentro de la propia ficha** (*ver todos / ver solo bloqueos / ver por confirmar*).
+- **Cada requisito (fila escaneable):**
+  - Borde izquierdo `4px` semántico por estado.
+  - Badge de prioridad (`Obligatorio` / `Opcional`).
+  - Explicación determinista en 1 línea (`evalItem.reason[locale]`).
+  - Micro-acción inline a la derecha: **`¿Qué significa? (IA)`** (envía la duda puntual al Copiloto) o **`Completar dato`** (si el estado es `UNKNOWN` por campo vacío).
 
-## 6. Recorridos medibles
+### 4.3. Estrategia de elementos visuales funcionales (No decorativos)
+1. **Emblemas de Categoría y Banderas/Alcance tipográficos:** Cada categoría posee su icono y código visual coherente en tarjetas, chips de filtro y Mi Ruta.
+2. **Logos/Monogramas oficiales verificados (con respaldo limpio):** Cuando exista logotipo oficial verificado con licencia segura y CSP permitida (o **monograma geométrico tipográfico verificado** con los colores institucionales de ETH Zürich, PRONABEC, AWS, Google, SENA, etc. sin hacer peticiones externas de terceros que vulneren privacidad/offline), se muestra un avatar cuadrado `36x36` junto al `providerName`, acelerando el reconocimiento visual al escanear el listado offline u online.
+3. **Medidores de progreso gráficos:**
+   - En tarjeta/ficha: barra segmentada de compatibilidad (`[■ ■ ◧ □]`).
+   - En plazo: chip de barra de tiempo / urgencia cuando faltan `<= 21 días`.
+   - En *Mi Ruta*: barra de avance real de pasos completados (`2 de 3 pasos listos`).
+4. **Ilustraciones SVG ligeras (`< 4 KB`, inline sin dependencias externas):**
+   - Estado vacío de búsqueda (*«No hay convocatorias con esos 3 filtros»* + ilustración de brújula limpia + CTA único «Mostrar todas»).
+   - Estado vacío de *Mi Ruta* (*«Aún no guardaste ninguna oportunidad»* + ilustración de mapa con 1 punto marcado + CTA directo «Explorar oportunidades»).
 
-Una interacción es una activación de control (clic, toque o teclado); escribir texto y decisiones cognitivas se registran por separado. El objetivo de tres acciones no justifica saltarse consentimiento, autenticación o comprobaciones.
+---
 
-| Tarea desde Explorar | Trayecto | Objetivo |
-|---|---|---|
-| Comprender una oportunidad visible | Abrir detalle → Entender requisitos | 2 activaciones; lectura aparte |
-| Guardar una oportunidad visible | Guardar | 1, sin cuenta; sincronización posterior opcional |
-| Continuar una tarea guardada | Mi Ruta → abrir tarea → completar | 3 |
-| Visitar convocatoria visible | Abrir detalle → Ver convocatoria oficial | 2 |
-| Cambiar tipo de oportunidad | Tipo → seleccionar | 2 si actualización inmediata explícita |
-| Filtrado complejo | Más filtros → editar → Aplicar | ≥3 más las selecciones; excepción documentada |
+## 5. Diseño Mobile-First y Reglas de Composición Responsive
 
-Medir éxito sin ayuda, tiempo, errores, retrocesos y comprensión de requisitos. Objetivo de investigación: ≥80 % de éxito en tareas principales en una prueba formativa pequeña; no interpretar como estimación poblacional. No hay resultados medidos en esta fase.
+**Regla fundamental:** No comprimir dos columnas estrechas ni apilar paneles interminables en teléfonos. El espacio disponible manda la interacción:
 
-## 7. Heurísticas de Nielsen aplicadas
+| Ancho CSS | Estructura de Página | Navegación | Filtros en `/` | Asistente IA en Ficha |
+| --- | --- | --- | --- | --- |
+| **`320px` – `639px` (Móvil)** | 1 columna (`padding: 12px 14px`) | Header compacto (Logo + `ES\|EN`) + Barra inferior fija (`>=48px` altura) | Buscador + scroll horizontal de chips de categoría + botón **`Filtros`** que abre **Modal/Sheet** | Barra fija inferior encima de nav con `Sitio oficial` + botón **`Preguntar a IA ✨`** que abre **Bottom Sheet (`82dvh`, `overscroll-behavior: contain`)** |
+| **`640px` – `959px` (Tablet vertical)** | 1 columna amplia (`max-width: 720px`) | Header horizontal con 3 enlaces + `ES\|EN` | Buscador + chips + País en una fila + Popover `+ Filtros` | Pestañas claras encima del bloque (`Ficha y requisitos` \| `Asistente IA`) o botón flotante |
+| **`>= 960px` (Desktop)** | 2 columnas asimétricas en Detalle (`minmax(0, 1.35fr)` lectura + `minmax(0, 0.95fr)` Copiloto `position: sticky; top: 84px`) | Header horizontal limpio | Buscador + Chips + País + Popover `+ Filtros` | Panel lateral sticky siempre accesible sin competir con el título |
 
-La fuente [Nielsen Norman Group](https://www.nngroup.com/articles/ten-usability-heuristics/) sustenta la revisión heurística, no una certificación. Consulta: 2026-11-12.
+### Reglas específicas de botones, acordeones y modales
+- **Botones:** Nunca bajar de `44 × 44 px` en controles principales ni en móvil (`touch-action: manipulation`). Máximo **1 botón `.btn-primary` visible por tarjeta o bloque**.
+- **Acordeones nativos (`<details>` / `<summary>`):** Para *«Cómo postular paso a paso»*, *«Condiciones e información no publicada»*, *«Fuentes oficiales»* y *«Diagnóstico técnico»* en Ajustes. Cero JavaScript pesado, accesible con teclado por defecto y animación suave respetando `prefers-reduced-motion`.
+- **Modales y Bottom Sheets (`+ Filtros`, `Copiloto IA móvil`, `Editar perfil`):** Trap de foco accesible, cierre por tecla `Escape` y botón visible `Cerrar`, bloqueo de scroll trasero (`overscroll-behavior: contain`) y compatibilidad total con zoom del navegador al 200 % (`640px` reflow).
 
-| Heurística | Decisión UMBRAL | Evidencia a exigir |
-|---|---|---|
-| Estado visible | Guardado, descarga local y origen IA explícitos | Capturas de estados y pruebas de errores |
-| Lenguaje del mundo real | «Requisitos», «Mi Ruta», «Próximo paso» | Comprensión sin explicación del facilitador |
-| Control y libertad | Omitir guía, cancelar generación, deshacer | Recorrido por teclado |
-| Consistencia | Misma posición de guardar y fuente | Inventario de componentes |
-| Prevención | Advertir vencimiento y datos faltantes | Fixtures vencidas/incompletas |
-| Reconocimiento | Mostrar selección y requisitos junto a tarea | No requerir memorizar otro panel |
-| Flexibilidad | URL profunda y filtros persistentes | Back/forward y recarga |
-| Minimalismo | Una prioridad, detalles progresivos | Revisión de jerarquía |
-| Recuperación | Error concreto con siguiente paso | Fallo de red/modelo inducido |
-| Ayuda | Explicación breve contextual y guía repetible | Acceso desde Perfil/Ayuda |
+---
 
-## 8. Psicología convertida en decisiones
+## 6. Animaciones y microinteracciones con propósito
 
-Hipótesis de diseño, pendientes de validación: reducir la carga de elección con filtros progresivos; aprovechar reconocimiento con estados y requisitos siempre visibles; acercar acciones frecuentes al contenido y ampliar áreas táctiles; presentar primero fecha, elegibilidad y fuente para atención selectiva. Leyes de Hick y Fitts orientan alternativas y tamaños, pero no autorizan predecir porcentajes de mejora sin medición. No ocultar opciones críticas ni usar cuenta regresiva artificial. El usuario mantiene control sobre su objetivo y sus datos.
-
-## 9. Accesibilidad y lenguaje
-
-Objetivo WCAG 2.2 AA; revisar manualmente semántica, foco, lector de pantalla, errores, zoom y contraste. El análisis automático no demuestra conformidad. Usar `lang`, encabezados jerárquicos, landmarks, etiquetas visibles, estados mediante texto y aria-live moderado. ES/EN en UI y contenido curado donde exista traducción revisada; no alterar silenciosamente términos legales del origen. Fechas localizadas con zona explícita; evitar banderas como selector de idioma. Iconos siempre con texto en navegación primaria.
-
-Referencia normativa consultada 2026-11-12: [WCAG 2.2](https://www.w3.org/TR/WCAG22/), recomendación publicada mostrada por W3C: 12 diciembre 2024. Aplicación al producto y pruebas se detallan en QUALITY_AND_TEST_STRATEGY.md.
-
-## 10. Comprobación documental de pares de color
-
-Cálculo sRGB de luminancia relativa WCAG realizado el 12-11-2026 sobre valores hexadecimales, sin transparencias ni imagen de fondo. Es comprobación de tokens, **no** prueba de una interfaz ni declaración WCAG. Pares no enumerados, estados hover/disabled y superficies reales deben verificarse al implementar.
-
-| Primer plano / fondo | Ratio calculado |
-|---|---:|
-| #172033 / #FFFFFF | 16.27:1 |
-| #172033 / #F7F8FA | 15.31:1 |
-| #475569 / #FFFFFF | 7.58:1 |
-| #475569 / #F7F8FA | 7.13:1 |
-| #FFFFFF / #174C3C | 9.83:1 |
-| #172033 / #E4F0E9 | 13.90:1 |
-| #172033 / #D5EA77 | 12.29:1 |
-| #A82222 / #FFFFFF | 7.20:1 |
-| #1D4ED8 / #FFFFFF | 6.70:1 |
-
-El anillo de foco mantiene separación blanca; verificar también el contraste contra cada color adyacente y que no quede cubierto. No utilizar el acento claro como texto o borde funcional sobre blanco.
+| Elemento | Comportamiento propuesto | Regla `prefers-reduced-motion` |
+| --- | --- | --- |
+| **`IntroSplash`** | Solo cuando el usuario pulsa «Repetir bienvenida» o transición mínima `< 350ms` no bloqueante al cargar por 1.ª vez | Omitir por completo al instante |
+| **Selector `ES \| EN`** | Indicador deslizante `.lang-switch-thumb` (`transform: translateX`, `220ms cubic-bezier(0.22, 1, 0.36, 1)`) | Cambio inmediato (`transition-duration: 0ms`) |
+| **Botón `Guardar`** | Pulso sutil de icono (`scale(1.12)`) + cambio inmediato de texto a `Guardada` y contador en `Mi Ruta` | Cambio de estado instantáneo |
+| **Chips y Acordeones** | Expansión controlada por `opacity`/`transform` (sin `transition: all`) | Apertura inmediata sin animación |
+| **Bottom Sheet IA móvil** | Deslizamiento `translateY(100% -> 0)` de `240ms` con `overscroll-behavior: contain` | Aparición instantánea |

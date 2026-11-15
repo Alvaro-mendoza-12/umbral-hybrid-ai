@@ -102,7 +102,7 @@ export function buildBoundedPrompt(params: {
 
   const taskInstruction =
     kind === 'EXPLAIN_REQUIREMENTS'
-      ? 'Task: Explain the key requirements, conditions, and missing/unpublished information for this opportunity in plain language so an applicant understands what they need to verify before applying.'
+      ? 'Task: Explain what the applicant needs in practical terms (eligibility rules, documents to prepare, and anything that must be confirmed with the official source) without repeating the opportunity title verbatim in your summary.'
       : 'Task: Propose up to 3 concrete, actionable preparation steps the user can review and decide whether to add to their personal route, citing only the fragment IDs provided.';
 
   const safeNote = userFocusNote ? sanitizePlainText(userFocusNote, 240) : '';

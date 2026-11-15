@@ -1,6 +1,8 @@
 # UMBRAL Hybrid AI
 
-[Español](README.es.md) · [Prior Work Attribution](docs/PRIOR_WORK_AND_ATTRIBUTION.md) · [Testing & Verification Evidence](docs/TESTING_EVIDENCE.md) · [Devpost Submission Draft](docs/DEVPOST_SUBMISSION.md)
+[Español](README.es.md) · [Release Readiness Audit](docs/BUILDHYBRIDAI_RELEASE_READINESS.md) · [Devpost Submission](docs/DEVPOST_SUBMISSION.md) · [Final Audit](docs/FINAL_AUDIT.md) · [Production Checklist](docs/PRODUCTION_CHECKLIST.md) · [Firebase Setup](docs/FIREBASE_SETUP.md) · [IDX Handoff Guide](docs/IDX_HANDOFF_GUIDE.md) · [Gemini Nano Setup](docs/GEMINI_NANO_SETUP.md) · [Deployment Guide](docs/DEPLOYMENT_GUIDE.md) · [Testing Evidence](docs/TESTING_EVIDENCE.md) · [Prior Work Attribution](docs/PRIOR_WORK_AND_ATTRIBUTION.md)
+
+**Live Deployments:** [Firebase Hosting (`umbral-21e8b.web.app`)](https://umbral-21e8b.web.app) · [Vercel (`umbral-hybrid-ai.vercel.app`)](https://umbral-hybrid-ai.vercel.app)
 
 **UMBRAL Hybrid AI** is a bilingual (English / Spanish), privacy-first civic opportunity companion built for Google Firebase's **#BuildHybridAI 2026** hackathon. It helps students, job seekers, and early founders discover verified education, scholarship, job, and funding opportunities, run a deterministic requirement check, organize next steps in a local **My Route** workspace, and get structured contextual AI guidance via **Firebase AI Logic Hybrid Inference**.
 
@@ -15,7 +17,7 @@
    - Instant filtering by country, category, modality, deadline window, language, and free-text search in 3 clicks or fewer.
 2. **Deterministic 4-State Self-Check (`/opportunities/:id`)**:
    - Evaluates a learner's profile against opportunity requirements without ever issuing an official eligibility decision.
-   - Separates `MATCHES`, `DOES_NOT_MATCH`, `NEEDS_CONFIRMATION`, and `UNKNOWN` deterministically in pure TypeScript (`src/domain/matcher.ts`), completely independent of LLM availability.
+   - Separates `MATCH`, `MISMATCH`, `NEEDS_CONFIRMATION`, and `UNKNOWN` (displayed as Match, Mismatch, Needs confirmation, and Unknown) deterministically in pure TypeScript (`src/domain/matcher.ts`), completely independent of LLM availability.
 3. **Firebase AI Logic Hybrid Inference (`src/adapters/firebase/`)**:
    - Powered by `firebase/ai` (`firebase@^13.3.0`) with `GoogleAIBackend`, `useLimitedUseAppCheckTokens: true`, and Firebase App Check (`ReCaptchaEnterpriseProvider` in production, optional env-driven debug token in non-production dev).
    - Supports all four Firebase AI Logic modes (`PREFER_ON_DEVICE`, `ONLY_ON_DEVICE`, `PREFER_IN_CLOUD`, `ONLY_IN_CLOUD`), user-triggered on-device Gemini Nano model initialization (`initializeDeviceModel`), structured JSON outputs (`Schema.object` for cloud and `responseConstraint` JSON schema for on-device Chrome `LanguageModel`), and `ONLY_IN_CLOUD` multi-turn follow-up/comparison (`startChat`).
@@ -25,7 +27,7 @@
 5. **Accessible, Thoughtful UX (`src/app/`, `src/styles/`)**:
    - Non-blocking center-pulse-to-header launch transition (`IntroSplash`, honors `prefers-reduced-motion`).
    - Keyboard-accessible, non-modal 4-step guided spotlight tour (`OnboardingTour`) with persisted completion state.
-   - Responsive mobile-first layout verified across 7 viewport widths (`320px` to `1440px`), 200% zoom reflow, keyboard navigation, and Axe WCAG 2.2 AA audits.
+   - Responsive mobile-first layout verified across 8 viewport widths (`320px` to `1440px`), 200% zoom reflow, keyboard navigation, PWA offline reload (`/route`), and Axe WCAG 2.2 AA audits.
 
 ---
 
@@ -96,8 +98,7 @@ npm run test:e2e     # Production build + Playwright E2E + Axe WCAG 2.2 AA suite
 
 ## Current Operational & Submission Transparency
 
-- **Verified locally on Chrome 157 / Windows:** Unit, integration, production build, and Playwright/Axe suites execute cleanly against the built web application.
-- **Unverified live execution items (require user Firebase project / capable consumer hardware):**
-  - Live `GoogleAIBackend` cloud calls against Firebase AI Logic and Firebase Hosting deployment require your Firebase project credentials and `firebase login`.
-  - Live Gemini Nano download/execution inside Chrome depends on client hardware/disk eligibility (`window.LanguageModel.availability()` reported `"unavailable"` inside headless Chrome 157 on the development test machine).
-- **Android client:** Not included in this release because no physical AICore-capable Android device was connected during development; rather than shipping an empty wrapper, focus remained exclusively on depth and quality for the **Web/Chrome** and **Grand Prize** tracks.
+- **Verified locally on Chrome `157.0.8103.51` / Windows 11 (`2026-11-15`):** `npm run typecheck`, `npm run lint`, `npm run test` (10 files, 51 unit/integration tests), `npm run build` (`PWA v1.3.0`), and `npx playwright test --workers=3 --reporter=list` (21 Chromium E2E & WCAG 2.2 AA Axe checks) pass cleanly.
+- **Verified live Cloud inference (`IN_CLOUD`):** Both [umbral-21e8b.web.app](https://umbral-21e8b.web.app) and [umbral-hybrid-ai.vercel.app](https://umbral-hybrid-ai.vercel.app) run Firebase AI Logic (`gemini-3.5-flash-lite`) protected by Firebase App Check (`reCAPTCHA Enterprise`, `useLimitedUseAppCheckTokens: true`) and block silent cloud fallback cleanly when Cloud Consent is OFF.
+- **Hardware gating for real Gemini Nano 4 (`ON_DEVICE`) execution:** Testing in non-headless Chrome Desktop `157.0.8103.51` downloaded `gemma4_component` (`2026.8.7.929`, `2,360.73 MiB` `weights.bin`) once `>= 20480 MiB` free disk was available on both the Chrome User Data and `%TEMP%`/`%TMP%` volumes, flipping `window.LanguageModel.availability()` to `"available"`. However, creating an active session failed on the `RTX 3050 4 GB` laptop GPU with Chromium `Performance Class: ServiceCrash` and `Enough VRAM: false (0 MiB actual, 3000 MiB required)`. Real `ON_DEVICE` inference verification & demo recording require Chrome Desktop `157+` on hardware with `>= 6–8 GB` dedicated GPU VRAM (or `>= 16 GB` Apple Silicon unified memory) and `>= 25 GB` free disk on `%TEMP%` and Chrome profile drives. See [docs/GEMINI_NANO_SETUP.md](docs/GEMINI_NANO_SETUP.md) and [docs/BUILDHYBRIDAI_RELEASE_READINESS.md](docs/BUILDHYBRIDAI_RELEASE_READINESS.md).
+- **Android / iOS clients:** Not included because this entry targets the single-platform **Web/Chrome** category.

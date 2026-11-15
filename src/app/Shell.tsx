@@ -1,17 +1,42 @@
-import { Compass, Route as RouteIcon, Settings, ShieldCheck, WifiOff } from 'lucide-react';
+import { Compass, Route as RouteIcon, Settings, WifiOff } from 'lucide-react';
 import { type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, NavLink } from 'react-router-dom';
 import { HybridReadinessPill } from '../components/HybridReadinessPill';
+import { LanguageSwitch } from '../components/LanguageSwitch';
 import { UmbralMark } from '../components/UmbralMark';
-import { useApp } from './appContextStore';
+import { prefersReducedMotion, useApp } from './appContextStore';
 import { IntroSplash } from './IntroSplash';
 import { OnboardingTour } from './OnboardingTour';
 
 export function Shell({ children }: { children: ReactNode }) {
   const { t } = useTranslation();
-  const { locale, setLocale, route, isOnline, storageWarning } = useApp();
+  const {
+    closeTour,
+    dismissIntro,
+    introActive,
+    isOnline,
+    preferences,
+    route,
+    storageWarning,
+    tourActive,
+  } = useApp();
   const savedCount = Object.keys(route.saved).length;
+
+  const handleHomeNavigation = () => {
+    if (introActive) {
+      dismissIntro();
+      if (preferences.tourStatus === 'never') {
+        closeTour('dismissed');
+      }
+    } else if (tourActive) {
+      closeTour('dismissed');
+    }
+    window.scrollTo({
+      top: 0,
+      behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+    });
+  };
 
   return (
     <div className="app-shell">
@@ -23,7 +48,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
       <header className="site-header">
         <div className="site-header-inner">
-          <Link to="/" className="brand-link">
+          <Link to="/" className="brand-link" onClick={handleHomeNavigation}>
             <span data-brand-anchor="header">
               <UmbralMark size={38} />
             </span>
@@ -34,7 +59,7 @@ export function Shell({ children }: { children: ReactNode }) {
           </Link>
 
           <nav className="desktop-nav" aria-label={t('nav.primaryLabel')}>
-            <NavLink to="/" end className="nav-link">
+            <NavLink to="/" end className="nav-link" onClick={handleHomeNavigation}>
               <Compass size={16} aria-hidden="true" />
               <span>{t('nav.explore')}</span>
             </NavLink>
@@ -60,34 +85,11 @@ export function Shell({ children }: { children: ReactNode }) {
               <Settings size={16} aria-hidden="true" />
               <span>{t('nav.settings')}</span>
             </NavLink>
-
-            <NavLink to="/privacy" className="nav-link">
-              <ShieldCheck size={16} aria-hidden="true" />
-              <span>{t('nav.privacy')}</span>
-            </NavLink>
           </nav>
 
           <div className="header-actions">
             <HybridReadinessPill />
-
-            <div className="lang-switch" role="group" aria-label={t('settings.languageSection')}>
-              <button
-                type="button"
-                className="lang-btn"
-                aria-pressed={locale === 'en'}
-                onClick={() => setLocale('en')}
-              >
-                EN
-              </button>
-              <button
-                type="button"
-                className="lang-btn"
-                aria-pressed={locale === 'es'}
-                onClick={() => setLocale('es')}
-              >
-                ES
-              </button>
-            </div>
+            <LanguageSwitch />
           </div>
         </div>
       </header>
@@ -120,7 +122,7 @@ export function Shell({ children }: { children: ReactNode }) {
       </footer>
 
       <nav className="mobile-bottom-nav" aria-label={t('nav.primaryLabel')}>
-        <NavLink to="/" end className="mobile-nav-item">
+        <NavLink to="/" end className="mobile-nav-item" onClick={handleHomeNavigation}>
           <Compass size={20} aria-hidden="true" />
           <span>{t('nav.explore')}</span>
         </NavLink>

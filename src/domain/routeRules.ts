@@ -1,3 +1,4 @@
+import { isSafeHttpsUrl } from './catalogRules';
 import type {
   ActiveGoal,
   Locale,
@@ -8,6 +9,8 @@ import type {
   TaskStatus,
   TrackingStatus,
 } from './types';
+
+export const MAX_ROUTE_IMPORT_BYTES = 512_000;
 
 export const MAX_GOAL_LENGTH = 120;
 export const MAX_TASK_LENGTH = 200;
@@ -285,15 +288,15 @@ export function removeSavedOpportunity(
 }
 
 export function normalizeMyRouteState(raw: unknown): MyRouteState {
-  if (!raw || typeof raw !== 'object') return emptyMyRouteState;
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return emptyMyRouteState;
   const obj = raw as Record<string, unknown>;
-  if (obj.version !== 2) return emptyMyRouteState;
+  if (obj.version !== 2 && obj.version !== 1) return emptyMyRouteState;
 
   let goal: ActiveGoal | null = null;
-  if (obj.goal && typeof obj.goal === 'object') {
+  if (obj.goal && typeof obj.goal === 'object' && !Array.isArray(obj.goal)) {
     const g = obj.goal as Record<string, unknown>;
     if (typeof g.text === 'string') {
-      const trimmed = g.text.trim();
+      const trimmed = g.text.replace(/\s+/g, ' ').trim();
       if (trimmed.length > 0 && trimmed.length <= MAX_GOAL_LENGTH) {
         goal = {
           text: trimmed,
@@ -360,7 +363,8 @@ export function normalizeMyRouteState(raw: unknown): MyRouteState {
         !providerSnap ||
         typeof providerSnap.es !== 'string' ||
         typeof providerSnap.en !== 'string' ||
-        typeof s.officialUrlSnapshot !== 'string'
+        typeof s.officialUrlSnapshot !== 'string' ||
+        !isSafeHttpsUrl(s.officialUrlSnapshot)
       ) {
         continue;
       }
@@ -447,4 +451,89 @@ export function exportRouteToMarkdown(state: MyRouteState, locale: Locale): stri
     }
   }
   return lines.join('\n');
+}
+
+export function exportRouteToJson(state: MyRouteState): string {
+  return JSON.stringify(normalizeMyRouteState(state), null, 2);
+}
+
+export type RouteImportErrorCode =
+  | 'INVALID_JSON'
+  | 'INVALID_SCHEMA'
+  | 'UNSUPPORTED_VERSION'
+  | 'FILE_TOO_LARGE';
+
+export type RouteImportResult =
+  | {
+      ok: true;
+      state: MyRouteState;
+      warnings: {
+        rejectedUrlsCount: number;
+        trimmedTasksCount: number;
+        upgradedFromV1: boolean;
+      };
+    }
+  | { ok: false; error: RouteImportErrorCode };
+
+export function parseAndValidateRouteImport(rawJson: string): RouteImportResult {
+  if (typeof rawJson !== 'string' || rawJson.length > MAX_ROUTE_IMPORT_BYTES) {
+    return { ok: false, error: 'FILE_TOO_LARGE' };
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(rawJson);
+  } catch {
+    return { ok: false, error: 'INVALID_JSON' };
+  }
+
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    return { ok: false, error: 'INVALID_SCHEMA' };
+  }
+
+  const obj = parsed as Record<string, unknown>;
+  if (typeof obj.version !== 'number') {
+    return { ok: false, error: 'INVALID_SCHEMA' };
+  }
+
+  if (obj.version !== 1 && obj.version !== 2) {
+    return { ok: false, error: 'UNSUPPORTED_VERSION' };
+  }
+
+  if (
+    obj.goal !== undefined &&
+    obj.goal !== null &&
+    (typeof obj.goal !== 'object' || Array.isArray(obj.goal))
+  ) {
+    return { ok: false, error: 'INVALID_SCHEMA' };
+  }
+  if (obj.tasks !== undefined && !Array.isArray(obj.tasks)) {
+    return { ok: false, error: 'INVALID_SCHEMA' };
+  }
+  if (
+    obj.saved !== undefined &&
+    (!obj.saved || typeof obj.saved !== 'object' || Array.isArray(obj.saved))
+  ) {
+    return { ok: false, error: 'INVALID_SCHEMA' };
+  }
+
+  const normalized = normalizeMyRouteState(obj);
+
+  const rawSavedCount =
+    obj.saved && typeof obj.saved === 'object' ? Object.keys(obj.saved).length : 0;
+  const acceptedSavedCount = Object.keys(normalized.saved).length;
+  const rejectedUrlsCount = Math.max(0, rawSavedCount - acceptedSavedCount);
+
+  const rawTasksCount = Array.isArray(obj.tasks) ? obj.tasks.length : 0;
+  const trimmedTasksCount = Math.max(0, rawTasksCount - normalized.tasks.length);
+
+  return {
+    ok: true,
+    state: normalized,
+    warnings: {
+      rejectedUrlsCount,
+      trimmedTasksCount,
+      upgradedFromV1: obj.version === 1,
+    },
+  };
 }

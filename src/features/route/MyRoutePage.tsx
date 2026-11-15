@@ -9,21 +9,30 @@ import {
   Plus,
   Trash2,
   Undo2,
+  Upload,
   X,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useApp } from '../../app/appContextStore';
-import { isSafeHttpsUrl } from '../../domain/catalogRules';
+import {
+  CategoryBadge,
+  DeadlineChip,
+  FitSummary,
+} from '../../components/OpportunityIndicators';
+import { getDeadlineCountdown, isSafeHttpsUrl } from '../../domain/catalogRules';
+import { evaluateOpportunityFit, hasAnyProfileInput } from '../../domain/matcher';
 import {
   countActiveTasks,
+  exportRouteToJson,
   exportRouteToMarkdown,
   MAX_ACTIVE_TASKS,
   MAX_GOAL_LENGTH,
   MAX_TASK_LENGTH,
 } from '../../domain/routeRules';
 import type {
+  Opportunity,
   SavedOpportunityTracking,
   TaskStatus,
   TrackingStatus,
@@ -44,7 +53,9 @@ function triggerDownload(filename: string, content: string, mimeType: string) {
 export function MyRoutePage() {
   const { t } = useTranslation();
   const {
+    catalogPort,
     locale,
+    profile,
     route,
     saveGoal,
     clearGoal,
@@ -57,11 +68,40 @@ export function MyRoutePage() {
     changeSavedStatus,
     unsaveOpportunity,
     restoreSavedOpportunity,
+    importRouteJson,
   } = useApp();
 
   const [goalDraft, setGoalDraft] = useState(route.goal?.text ?? '');
+  const [editingGoal, setEditingGoal] = useState(!route.goal);
   const [pendingReplaceGoal, setPendingReplaceGoal] = useState<string | null>(null);
   const [goalFeedback, setGoalFeedback] = useState<string | null>(null);
+  const [catalogMap, setCatalogMap] = useState<Record<string, Opportunity>>({});
+
+  useEffect(() => {
+    let cancelled = false;
+    void catalogPort
+      .listOpportunities({
+        query: '',
+        country: '',
+        category: '',
+        modality: '',
+        includeClosed: true,
+      })
+      .then((items) => {
+        if (cancelled) return;
+        const next: Record<string, Opportunity> = {};
+        for (const opp of items) {
+          next[opp.id] = opp;
+        }
+        setCatalogMap(next);
+      })
+      .catch(() => {
+        // Keep snapshot display when catalog lookup is unavailable.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [catalogPort]);
 
   const [taskDraft, setTaskDraft] = useState('');
   const [taskDateDraft, setTaskDateDraft] = useState('');
@@ -71,8 +111,18 @@ export function MyRoutePage() {
 
   const [lastRemoved, setLastRemoved] = useState<SavedOpportunityTracking | null>(null);
   const [exportMessage, setExportMessage] = useState<string | null>(null);
+  const [importFeedback, setImportFeedback] = useState<{
+    kind: 'ok' | 'error';
+    message: string;
+  } | null>(null);
+  const importInputRef = useRef<HTMLInputElement | null>(null);
 
   const activeTasksCount = countActiveTasks(route.tasks);
+  const hasProfile = hasAnyProfileInput(profile);
+  const doneTasksCount = route.tasks.filter((task) => task.status === 'completed').length;
+  const progressPct =
+    route.tasks.length > 0 ? Math.round((doneTasksCount / route.tasks.length) * 100) : 0;
+  const isEditingGoal = editingGoal || !route.goal;
   const savedItems = Object.values(route.saved).sort((a, b) =>
     b.updatedAt.localeCompare(a.updatedAt),
   );
@@ -93,6 +143,7 @@ export function MyRoutePage() {
       return;
     }
     setPendingReplaceGoal(null);
+    setEditingGoal(false);
   };
 
   const handleConfirmReplace = () => {
@@ -100,6 +151,7 @@ export function MyRoutePage() {
     const result = saveGoal(pendingReplaceGoal, { confirmReplace: true });
     if (result.ok) {
       setPendingReplaceGoal(null);
+      setEditingGoal(false);
     }
   };
 
@@ -125,14 +177,43 @@ export function MyRoutePage() {
   };
 
   return (
-    <div className="stack-lg">
-      <section className="surface-card stack-sm">
-        <h1 style={{ margin: 0, fontSize: 'clamp(1.38rem, 2.4vw, 1.85rem)' }}>
-          {t('route.heading')}
-        </h1>
-        <p style={{ margin: 0, color: 'var(--ink-secondary)' }}>
-          {t('route.subheading')}
-        </p>
+    <div className="stack-lg animate-enter">
+      <section className="surface-card stack-md">
+        <div className="stack-sm">
+          <h1 style={{ margin: 0, fontSize: 'clamp(1.38rem, 2.4vw, 1.85rem)' }}>
+            {t('route.heading')}
+          </h1>
+          <p style={{ margin: 0, color: 'var(--ink-secondary)' }}>
+            {t('route.subheading')}
+          </p>
+        </div>
+
+        <div className="route-kpi-grid" aria-hidden="true">
+          <div className="subtle-card stack-sm" style={{ gap: '2px', padding: '10px 12px' }}>
+            <span style={{ fontSize: '0.78rem', color: 'var(--ink-muted)', fontWeight: 600 }}>
+              {t('route.kpiGoal')}
+            </span>
+            <strong style={{ fontSize: '1.15rem', fontVariantNumeric: 'tabular-nums' }}>
+              {route.goal ? '1/1' : '0/1'}
+            </strong>
+          </div>
+          <div className="subtle-card stack-sm" style={{ gap: '2px', padding: '10px 12px' }}>
+            <span style={{ fontSize: '0.78rem', color: 'var(--ink-muted)', fontWeight: 600 }}>
+              {t('route.kpiSteps')}
+            </span>
+            <strong style={{ fontSize: '1.15rem', fontVariantNumeric: 'tabular-nums' }}>
+              {activeTasksCount}/{MAX_ACTIVE_TASKS}
+            </strong>
+          </div>
+          <div className="subtle-card stack-sm" style={{ gap: '2px', padding: '10px 12px' }}>
+            <span style={{ fontSize: '0.78rem', color: 'var(--ink-muted)', fontWeight: 600 }}>
+              {t('route.kpiSaved')}
+            </span>
+            <strong style={{ fontSize: '1.15rem', fontVariantNumeric: 'tabular-nums' }}>
+              {savedItems.length}
+            </strong>
+          </div>
+        </div>
       </section>
 
       <section className="surface-card stack-md" aria-labelledby="goal-heading">
@@ -149,64 +230,97 @@ export function MyRoutePage() {
             {t('route.goalHeading')}
           </h2>
           {route.goal && (
-            <button
-              type="button"
-              className="btn btn-ghost btn-sm"
-              onClick={() => {
-                clearGoal();
-                setGoalDraft('');
-                setPendingReplaceGoal(null);
-              }}
-            >
-              <X size={14} aria-hidden="true" />
-              <span>{t('route.goalClearBtn')}</span>
-            </button>
+            <div className="card-actions" style={{ gap: '6px' }}>
+              {!isEditingGoal && (
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => {
+                    setGoalDraft(route.goal?.text ?? '');
+                    setEditingGoal(true);
+                  }}
+                >
+                  <Pencil size={14} aria-hidden="true" />
+                  <span>{t('route.goalEditBtn')}</span>
+                </button>
+              )}
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                onClick={() => {
+                  clearGoal();
+                  setGoalDraft('');
+                  setEditingGoal(true);
+                  setPendingReplaceGoal(null);
+                }}
+              >
+                <X size={14} aria-hidden="true" />
+                <span>{t('route.goalClearBtn')}</span>
+              </button>
+            </div>
           )}
         </div>
 
-        {route.goal && (
+        {route.goal && !isEditingGoal && (
           <div className="banner banner-good" style={{ marginBottom: 0 }}>
             <strong>{route.goal.text}</strong>
           </div>
         )}
 
-        <form onSubmit={handleGoalSubmit} className="stack-sm">
-          <label htmlFor="route-goal-input" className="sr-only">
-            {t('route.goalInputLabel')}
-          </label>
-          <input
-            id="route-goal-input"
-            type="text"
-            maxLength={MAX_GOAL_LENGTH}
-            className="text-input"
-            value={goalDraft}
-            placeholder={t('route.goalPlaceholder')}
-            onChange={(e) => setGoalDraft(e.target.value)}
-          />
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              gap: '12px',
-              flexWrap: 'wrap',
-            }}
-          >
-            <span style={{ fontSize: '0.82rem', color: 'var(--ink-muted)' }}>
-              {t('route.goalChars', {
-                count: goalDraft.trim().length,
-                max: MAX_GOAL_LENGTH,
-              })}
-            </span>
-            <button
-              type="submit"
-              className="btn btn-primary btn-sm"
-              disabled={!goalDraft.trim()}
+        {isEditingGoal && (
+          <form onSubmit={handleGoalSubmit} className="stack-sm">
+            <label htmlFor="route-goal-input" className="sr-only">
+              {t('route.goalInputLabel')}
+            </label>
+            <input
+              id="route-goal-input"
+              type="text"
+              maxLength={MAX_GOAL_LENGTH}
+              className="text-input"
+              value={goalDraft}
+              placeholder={t('route.goalPlaceholder')}
+              onChange={(e) => setGoalDraft(e.target.value)}
+            />
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                gap: '12px',
+                flexWrap: 'wrap',
+              }}
             >
-              {t('route.goalSetBtn')}
-            </button>
-          </div>
-        </form>
+              <span style={{ fontSize: '0.82rem', color: 'var(--ink-muted)' }}>
+                {t('route.goalChars', {
+                  count: goalDraft.trim().length,
+                  max: MAX_GOAL_LENGTH,
+                })}
+              </span>
+              <div className="card-actions" style={{ gap: '8px' }}>
+                {route.goal && (
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => {
+                      setGoalDraft(route.goal?.text ?? '');
+                      setEditingGoal(false);
+                      setPendingReplaceGoal(null);
+                    }}
+                  >
+                    {t('common.cancel')}
+                  </button>
+                )}
+                <button
+                  type="submit"
+                  className="btn btn-primary btn-sm"
+                  disabled={!goalDraft.trim()}
+                >
+                  {t('route.goalSetBtn')}
+                </button>
+              </div>
+            </div>
+          </form>
+        )}
 
         {pendingReplaceGoal && route.goal && (
           <div className="banner banner-warn stack-sm" role="region" aria-label={t('route.goalConfirmReplaceTitle')}>
@@ -247,6 +361,30 @@ export function MyRoutePage() {
         <h2 id="tasks-heading" style={{ margin: 0, fontSize: '1.15rem' }}>
           {t('route.tasksHeading', { active: activeTasksCount })}
         </h2>
+
+        {route.tasks.length > 0 && (
+          <div className="progress-track-wrap">
+            <div className="progress-track-header">
+              <span>
+                {t('route.progressLabel', {
+                  done: doneTasksCount,
+                  total: route.tasks.length,
+                })}
+              </span>
+              <strong>{progressPct}%</strong>
+            </div>
+            <div
+              className="progress-track"
+              role="progressbar"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={progressPct}
+              aria-label={t('route.progressAria', { pct: progressPct })}
+            >
+              <div className="progress-fill" style={{ width: `${progressPct}%` }} />
+            </div>
+          </div>
+        )}
 
         {activeTasksCount >= MAX_ACTIVE_TASKS && (
           <div className="banner banner-info" role="status">
@@ -330,6 +468,7 @@ export function MyRoutePage() {
                       <input
                         type="text"
                         maxLength={MAX_TASK_LENGTH}
+                        aria-label={t('route.taskEditLabel')}
                         className="text-input"
                         value={editingTaskText}
                         onChange={(e) => setEditingTaskText(e.target.value)}
@@ -394,7 +533,7 @@ export function MyRoutePage() {
 
                       <div className="card-actions">
                         <label className="sr-only" htmlFor={`status-${task.id}`}>
-                          Task status
+                          {t('route.taskStatusLabel')}
                         </label>
                         <select
                           id={`status-${task.id}`}
@@ -510,7 +649,33 @@ export function MyRoutePage() {
         )}
 
         {savedItems.length === 0 ? (
-          <div className="subtle-card stack-sm">
+          <div className="subtle-card empty-state stack-sm">
+            <svg
+              width="64"
+              height="48"
+              viewBox="0 0 64 48"
+              fill="none"
+              aria-hidden="true"
+              className="empty-state-svg"
+            >
+              <rect
+                x="8"
+                y="6"
+                width="48"
+                height="36"
+                rx="8"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeDasharray="4 4"
+              />
+              <path
+                d="M26 16h12v18l-6-4-6 4V16z"
+                stroke="var(--brand-primary)"
+                strokeWidth="2"
+                strokeLinejoin="round"
+                fill="var(--brand-primary-tint)"
+              />
+            </svg>
             <strong>{t('route.savedEmptyTitle')}</strong>
             <span style={{ color: 'var(--ink-secondary)', fontSize: '0.9rem' }}>
               {t('route.savedEmptyBody')}
@@ -536,6 +701,7 @@ export function MyRoutePage() {
               const safeUrl = isSafeHttpsUrl(item.officialUrlSnapshot)
                 ? item.officialUrlSnapshot
                 : null;
+              const liveOpp = catalogMap[item.opportunityId];
               return (
                 <li key={item.opportunityId} className="subtle-card stack-sm">
                   <div
@@ -546,7 +712,13 @@ export function MyRoutePage() {
                       flexWrap: 'wrap',
                     }}
                   >
-                    <div className="stack-sm" style={{ gap: '2px' }}>
+                    <div className="stack-sm" style={{ gap: '4px' }}>
+                      {liveOpp && (
+                        <div className="saved-meta-row">
+                          <CategoryBadge category={liveOpp.category} />
+                          <DeadlineChip countdown={getDeadlineCountdown(liveOpp)} />
+                        </div>
+                      )}
                       <Link
                         to={`/opportunities/${item.opportunityId}`}
                         style={{ fontWeight: 700, textDecoration: 'none' }}
@@ -556,6 +728,12 @@ export function MyRoutePage() {
                       <span style={{ fontSize: '0.84rem', color: 'var(--ink-muted)' }}>
                         {item.providerSnapshot[locale]}
                       </span>
+                      {liveOpp && (
+                        <FitSummary
+                          summary={evaluateOpportunityFit(liveOpp, profile)}
+                          hasProfile={hasProfile}
+                        />
+                      )}
                     </div>
 
                     <select
@@ -644,7 +822,7 @@ export function MyRoutePage() {
             onClick={() => {
               triggerDownload(
                 'umbral-my-route.json',
-                JSON.stringify(route, null, 2),
+                exportRouteToJson(route),
                 'application/json;charset=utf-8',
               );
               setExportMessage(t('route.exportedNotice', { format: 'JSON' }));
@@ -653,12 +831,79 @@ export function MyRoutePage() {
             <Download size={15} aria-hidden="true" />
             <span>{t('route.exportJson')}</span>
           </button>
+
+          <button
+            type="button"
+            className="btn btn-secondary btn-sm"
+            onClick={() => importInputRef.current?.click()}
+          >
+            <Upload size={15} aria-hidden="true" />
+            <span>{t('route.importJson')}</span>
+          </button>
+
+          <input
+            ref={importInputRef}
+            id="route-import-input"
+            type="file"
+            accept=".json,application/json"
+            aria-label={t('route.importJson')}
+            style={{ display: 'none' }}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              e.target.value = '';
+              if (!file) return;
+              void file
+                .text()
+                .then((raw) => {
+                  const res = importRouteJson(raw);
+                  if (!res.ok) {
+                    setImportFeedback({
+                      kind: 'error',
+                      message: t(`route.importErrors.${res.error}`),
+                    });
+                    return;
+                  }
+                  setGoalDraft(res.state.goal?.text ?? '');
+                  setEditingGoal(!res.state.goal);
+                  setEditingTaskId(null);
+                  setImportFeedback({
+                    kind: 'ok',
+                    message: t(
+                      res.warnings.rejectedUrlsCount > 0
+                        ? 'route.importedNoticeWithRejected'
+                        : 'route.importedNotice',
+                      {
+                        saved: Object.keys(res.state.saved).length,
+                        tasks: res.state.tasks.length,
+                        rejected: res.warnings.rejectedUrlsCount,
+                      },
+                    ),
+                  });
+                })
+                .catch(() => {
+                  setImportFeedback({
+                    kind: 'error',
+                    message: t('route.importErrors.INVALID_JSON'),
+                  });
+                });
+            }}
+          />
         </div>
 
         {exportMessage && (
           <p role="status" aria-live="polite" style={{ margin: 0, fontSize: '0.88rem' }}>
             {exportMessage}
           </p>
+        )}
+
+        {importFeedback && (
+          <div
+            className={importFeedback.kind === 'error' ? 'banner banner-bad' : 'banner banner-good'}
+            role={importFeedback.kind === 'error' ? 'alert' : 'status'}
+            aria-live="polite"
+          >
+            <span>{importFeedback.message}</span>
+          </div>
         )}
       </section>
     </div>

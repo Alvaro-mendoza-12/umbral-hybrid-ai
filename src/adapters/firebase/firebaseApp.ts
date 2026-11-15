@@ -1,6 +1,8 @@
 import { getAI, GoogleAIBackend, type AI } from 'firebase/ai';
 import { getApp, getApps, initializeApp, type FirebaseApp } from 'firebase/app';
 import {
+  CustomProvider,
+  getToken,
   initializeAppCheck,
   ReCaptchaEnterpriseProvider,
   type AppCheck,
@@ -15,11 +17,13 @@ export interface InitializedFirebaseServices {
   app: FirebaseApp;
   ai: AI;
   appCheck: AppCheck | null;
+  appCheckReady: Promise<void>;
   status: FirebaseRuntimeStatus;
 }
 
 let cachedServices: InitializedFirebaseServices | null = null;
 let cachedAppCheck: AppCheck | null = null;
+let cachedAppCheckReady: Promise<void> = Promise.resolve();
 let cachedAi: AI | null = null;
 
 export function getOrInitFirebaseAIServices(): InitializedFirebaseServices | null {
@@ -29,7 +33,10 @@ export function getOrInitFirebaseAIServices(): InitializedFirebaseServices | nul
   }
 
   if (cachedServices) {
-    return cachedServices;
+    return {
+      ...cachedServices,
+      status,
+    };
   }
 
   const publicConfig = readFirebasePublicConfig();
@@ -45,17 +52,36 @@ export function getOrInitFirebaseAIServices(): InitializedFirebaseServices | nul
           appId: publicConfig.appId,
         });
 
-  if (!cachedAppCheck && publicConfig.siteKey && typeof window !== 'undefined') {
+  if (!cachedAppCheck && typeof self !== 'undefined') {
     if (!import.meta.env.PROD && publicConfig.debugToken) {
-      const globalSelf = window as unknown as Record<string, unknown>;
-      globalSelf.FIREBASE_APPCHECK_DEBUG_TOKEN =
+      const globalScope = self as unknown as {
+        FIREBASE_APPCHECK_DEBUG_TOKEN?: boolean | string;
+      };
+      globalScope.FIREBASE_APPCHECK_DEBUG_TOKEN =
         publicConfig.debugToken === 'true' ? true : publicConfig.debugToken;
+
+      cachedAppCheck = initializeAppCheck(app, {
+        provider: new CustomProvider({
+          getToken: async () => {
+            throw new Error(
+              'App Check CustomProvider fallback should not be called while debug mode is active.',
+            );
+          },
+        }),
+        isTokenAutoRefreshEnabled: true,
+      });
+    } else if (publicConfig.siteKey) {
+      cachedAppCheck = initializeAppCheck(app, {
+        provider: new ReCaptchaEnterpriseProvider(publicConfig.siteKey),
+        isTokenAutoRefreshEnabled: true,
+      });
     }
 
-    cachedAppCheck = initializeAppCheck(app, {
-      provider: new ReCaptchaEnterpriseProvider(publicConfig.siteKey),
-      isTokenAutoRefreshEnabled: true,
-    });
+    if (cachedAppCheck) {
+      cachedAppCheckReady = getToken(cachedAppCheck, false)
+        .then(() => undefined)
+        .catch(() => undefined);
+    }
   }
 
   if (!cachedAi) {
@@ -69,6 +95,7 @@ export function getOrInitFirebaseAIServices(): InitializedFirebaseServices | nul
     app,
     ai: cachedAi,
     appCheck: cachedAppCheck,
+    appCheckReady: cachedAppCheckReady,
     status,
   };
 

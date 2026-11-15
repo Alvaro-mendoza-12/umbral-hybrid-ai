@@ -34,15 +34,15 @@ function IntroSplashStage({ onDismiss }: { onDismiss: () => void }) {
         setDockTransform('translate(calc(-50% - 35vw), calc(-50% - 42vh)) scale(0.83)');
       }
       setPhase('dock');
-    }, 320);
+    }, 220);
 
     const fadeTimer = window.setTimeout(() => {
       setPhase('fade');
-    }, 640);
+    }, 440);
 
     const doneTimer = window.setTimeout(() => {
       onDismiss();
-    }, 860);
+    }, 580);
 
     const handleUserInterrupt = (e: Event) => {
       if (

@@ -1,6 +1,8 @@
 # UMBRAL Hybrid AI
 
-[English](README.md) · [Atribución de trabajo previo](docs/PRIOR_WORK_AND_ATTRIBUTION.md) · [Evidencia de pruebas](docs/TESTING_EVIDENCE.md) · [Borrador Devpost](docs/DEVPOST_SUBMISSION.md)
+[English](README.md) · [Auditoría `#BuildHybridAI`](docs/BUILDHYBRIDAI_RELEASE_READINESS.md) · [Postulación Devpost](docs/DEVPOST_SUBMISSION.md) · [Auditoría Final](docs/FINAL_AUDIT.md) · [Checklist de Producción](docs/PRODUCTION_CHECKLIST.md) · [Configurar Firebase](docs/FIREBASE_SETUP.md) · [Configurar Gemini Nano](docs/GEMINI_NANO_SETUP.md) · [Guía de Despliegue](docs/DEPLOYMENT_GUIDE.md) · [Evidencia de Pruebas](docs/TESTING_EVIDENCE.md) · [Atribución de Trabajo Previo](docs/PRIOR_WORK_AND_ATTRIBUTION.md)
+
+**Despliegues públicos:** [Firebase Hosting (`umbral-21e8b.web.app`)](https://umbral-21e8b.web.app) · [Vercel (`umbral-hybrid-ai.vercel.app`)](https://umbral-hybrid-ai.vercel.app)
 
 **UMBRAL Hybrid AI** es una aplicación web bilingüe (español / inglés), accesible y centrada en la privacidad, construida para la hackathon oficial **#BuildHybridAI 2026** de Google Firebase. Ayuda a estudiantes, personas en búsqueda de empleo y emprendedores a descubrir oportunidades verificadas (becas, empleo, formación y financiamiento), comprobar sus requisitos de forma determinista, organizar sus próximos pasos en **Mi Ruta** y recibir ayuda contextual mediante **Firebase AI Logic Hybrid Inference**.
 
@@ -15,7 +17,7 @@
    - Filtros inmediatos por país, categoría, modalidad, ventana de cierre, idioma y texto libre en tres clics o menos.
 2. **Autocomprobación determinista en 4 estados (`/opportunities/:id`)**:
    - Compara el perfil ingresado con los requisitos de la convocatoria sin emitir decisiones oficiales de elegibilidad.
-   - Separa `MATCHES`, `DOES_NOT_MATCH`, `NEEDS_CONFIRMATION` y `UNKNOWN` de forma determinista en TypeScript puro (`src/domain/matcher.ts`), sin depender de modelos de IA.
+   - Separa `MATCH`, `MISMATCH`, `NEEDS_CONFIRMATION` y `UNKNOWN` (mostrados como Coincide, No coincide, Por confirmar y Desconocido) de forma determinista en TypeScript puro (`src/domain/matcher.ts`), sin depender de modelos de IA.
 3. **IA Híbrida real con Firebase AI Logic (`src/adapters/firebase/`)**:
    - Integración directa con `firebase/ai` (`firebase@^13.3.0`) usando `GoogleAIBackend`, `useLimitedUseAppCheckTokens: true` y Firebase App Check (`ReCaptchaEnterpriseProvider` en producción y token de depuración configurable solo fuera de producción).
    - Soporta los cuatro modos (`PREFER_ON_DEVICE`, `ONLY_ON_DEVICE`, `PREFER_IN_CLOUD`, `ONLY_IN_CLOUD`), descarga explícita bajo acción del usuario (`initializeDeviceModel`), salidas JSON estructuradas (`Schema.object` en nube y `responseConstraint` en Chrome local) y chat/comparación multi-turno en la nube (`startChat` con `ONLY_IN_CLOUD`).
@@ -25,7 +27,7 @@
 5. **UX accesible y diseño centrado en las personas (`src/app/`, `src/styles/`)**:
    - Animación inicial breve hacia la esquina superior izquierda (`IntroSplash`, respeta `prefers-reduced-motion`).
    - Guía interactiva no modal de 4 pasos (`OnboardingTour`) operable por teclado y lectores de pantalla, con persistencia de finalización.
-   - Diseño responsive mobile-first verificado en 7 anchos (`320px` a `1440px`), reflow al 200%, navegación completa con teclado y auditorías Axe WCAG 2.2 AA.
+   - Diseño responsive mobile-first verificado en 8 anchos (`320px` a `1440px`), reflow al 200%, recarga offline PWA (`/route`), navegación completa con teclado y auditorías Axe WCAG 2.2 AA.
 
 ---
 

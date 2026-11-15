@@ -3,11 +3,14 @@ import { curatedOpportunities } from '../../src/data/opportunities';
 import {
   addRouteTask,
   emptyMyRouteState,
+  exportRouteToJson,
   exportRouteToMarkdown,
   MAX_GOAL_LENGTH,
+  MAX_ROUTE_IMPORT_BYTES,
   MAX_TASK_LENGTH,
   moveRouteTask,
   normalizeMyRouteState,
+  parseAndValidateRouteImport,
   removeSavedOpportunity,
   saveOpportunityToRoute,
   setActiveGoal,
@@ -85,5 +88,102 @@ describe('routeRules', () => {
     expect(removed.state.saved[opp.id]).toBeUndefined();
 
     expect(normalizeMyRouteState({ bad: true })).toEqual(emptyMyRouteState);
+  });
+
+  it('rejects non-HTTPS saved snapshots during normalization and JSON import', () => {
+    const opp = curatedOpportunities[0]!;
+    const poisoned = {
+      version: 2,
+      goal: null,
+      tasks: [],
+      saved: {
+        [opp.id]: {
+          opportunityId: opp.id,
+          titleSnapshot: opp.title,
+          providerSnapshot: opp.providerName,
+          officialUrlSnapshot: 'javascript:alert(1)',
+          status: 'saved',
+          savedAt: '2026-11-14T00:00:00.000Z',
+          updatedAt: '2026-11-14T00:00:00.000Z',
+        },
+        unsafeHttp: {
+          opportunityId: 'unsafeHttp',
+          titleSnapshot: opp.title,
+          providerSnapshot: opp.providerName,
+          officialUrlSnapshot: 'http://insecure.example.com',
+          status: 'saved',
+          savedAt: '2026-11-14T00:00:00.000Z',
+          updatedAt: '2026-11-14T00:00:00.000Z',
+        },
+      },
+    };
+
+    const normalized = normalizeMyRouteState(poisoned);
+    expect(Object.keys(normalized.saved)).toEqual([]);
+
+    const imported = parseAndValidateRouteImport(JSON.stringify(poisoned));
+    expect(imported.ok).toBe(true);
+    if (imported.ok) {
+      expect(Object.keys(imported.state.saved)).toEqual([]);
+      expect(imported.warnings.rejectedUrlsCount).toBe(2);
+    }
+  });
+
+  it('validates JSON backup exports, v1 upgrades, malformed inputs, size cap, and active task limits', () => {
+    const opp = curatedOpportunities[0]!;
+    let state = saveOpportunityToRoute(emptyMyRouteState, opp);
+    const goalRes = setActiveGoal(state, 'Verify transcript and references');
+    if (goalRes.ok) state = goalRes.state;
+    const t1 = addRouteTask(state, 'Download transcript', { id: 't1' });
+    if (t1.ok) state = t1.state;
+
+    const json = exportRouteToJson(state);
+    const roundTrip = parseAndValidateRouteImport(json);
+    expect(roundTrip.ok).toBe(true);
+    if (roundTrip.ok) {
+      expect(roundTrip.state.goal?.text).toBe('Verify transcript and references');
+      expect(roundTrip.state.tasks).toHaveLength(1);
+      expect(roundTrip.warnings).toEqual({
+        rejectedUrlsCount: 0,
+        trimmedTasksCount: 0,
+        upgradedFromV1: false,
+      });
+    }
+
+    const v1 = parseAndValidateRouteImport(
+      JSON.stringify({
+        version: 1,
+        goal: null,
+        tasks: [
+          { id: '1', text: 'One', status: 'pending', createdAt: '2026-11-14T00:00:00Z', updatedAt: '2026-11-14T00:00:00Z' },
+          { id: '2', text: 'Two', status: 'pending', createdAt: '2026-11-14T00:00:00Z', updatedAt: '2026-11-14T00:00:00Z' },
+          { id: '3', text: 'Three', status: 'in_progress', createdAt: '2026-11-14T00:00:00Z', updatedAt: '2026-11-14T00:00:00Z' },
+          { id: '4', text: 'Four active exceeds cap', status: 'pending', createdAt: '2026-11-14T00:00:00Z', updatedAt: '2026-11-14T00:00:00Z' },
+        ],
+        saved: {},
+      }),
+    );
+    expect(v1.ok).toBe(true);
+    if (v1.ok) {
+      expect(v1.state.version).toBe(2);
+      expect(v1.state.tasks).toHaveLength(3);
+      expect(v1.warnings.upgradedFromV1).toBe(true);
+      expect(v1.warnings.trimmedTasksCount).toBe(1);
+    }
+
+    expect(parseAndValidateRouteImport('{bad-json')).toEqual({ ok: false, error: 'INVALID_JSON' });
+    expect(parseAndValidateRouteImport(JSON.stringify([]))).toEqual({ ok: false, error: 'INVALID_SCHEMA' });
+    expect(parseAndValidateRouteImport(JSON.stringify({ version: 2, tasks: 'bad' }))).toEqual({
+      ok: false,
+      error: 'INVALID_SCHEMA',
+    });
+    expect(parseAndValidateRouteImport(JSON.stringify({ version: 99, tasks: [], saved: {} }))).toEqual({
+      ok: false,
+      error: 'UNSUPPORTED_VERSION',
+    });
+    expect(parseAndValidateRouteImport('x'.repeat(MAX_ROUTE_IMPORT_BYTES + 1))).toEqual({
+      ok: false,
+      error: 'FILE_TOO_LARGE',
+    });
   });
 });

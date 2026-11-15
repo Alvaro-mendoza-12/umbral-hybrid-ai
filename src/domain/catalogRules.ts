@@ -106,7 +106,11 @@ export function filterOpportunities(
   const filtered = opportunities.filter((opportunity) => {
     const status = computeOpportunityStatus(opportunity, now);
     if (status === 'withdrawn') return false;
-    if (!filters.includeClosed && status === 'closed') {
+    if (
+      !filters.includeClosed &&
+      filters.deadlineWindow !== 'review_required' &&
+      (status === 'closed' || status === 'review_required')
+    ) {
       return false;
     }
 
@@ -120,6 +124,44 @@ export function filterOpportunities(
 
     if (filters.modality && opportunity.modality !== filters.modality) {
       return false;
+    }
+
+    if (
+      filters.language &&
+      opportunity.sourceLanguage !== filters.language &&
+      opportunity.sourceLanguage !== 'es/en'
+    ) {
+      return false;
+    }
+
+    if (filters.deadlineWindow) {
+      if (filters.deadlineWindow === 'review_required' && status !== 'review_required') {
+        return false;
+      }
+      if (filters.deadlineWindow === 'ongoing' && status !== 'ongoing') {
+        return false;
+      }
+      if (filters.deadlineWindow === 'has_deadline' && !opportunity.deadline.closesOn) {
+        return false;
+      }
+      if (filters.deadlineWindow === 'closing_soon') {
+        if (status !== 'open' || !opportunity.deadline.closesOn) {
+          return false;
+        }
+        const tz =
+          opportunity.deadline.timeZone ??
+          COUNTRY_TIMEZONES[opportunity.countryCode] ??
+          'UTC';
+        const todayIso = getDateInTimeZone(now, tz);
+        const diffDays = Math.floor(
+          (Date.parse(`${opportunity.deadline.closesOn}T00:00:00Z`) -
+            Date.parse(`${todayIso}T00:00:00Z`)) /
+            86_400_000,
+        );
+        if (Number.isNaN(diffDays) || diffDays < 0 || diffDays > 30) {
+          return false;
+        }
+      }
     }
 
     if (normalizedQuery) {
@@ -187,4 +229,37 @@ export function formatIsoDate(dateStr: string, locale: Locale): string {
     dateStyle: 'medium',
     timeZone: 'UTC',
   }).format(new Date(parsed));
+}
+
+export type DeadlineCountdown =
+  | { kind: 'days'; days: number; urgent: boolean }
+  | { kind: 'today'; urgent: true }
+  | { kind: 'ongoing' }
+  | { kind: 'none' };
+
+/**
+ * Deterministic deadline countdown computed from the published `closesOn` date
+ * in the opportunity's own time zone. Returns `none` when no verifiable open
+ * deadline exists (closed, pending re-check, upcoming, withdrawn or undated).
+ * Never invents a date: it only reflects data already in the catalog.
+ */
+export function getDeadlineCountdown(
+  opportunity: Opportunity,
+  now: Date = new Date(),
+): DeadlineCountdown {
+  const status = computeOpportunityStatus(opportunity, now);
+  if (status === 'ongoing') return { kind: 'ongoing' };
+  if (status !== 'open' || !opportunity.deadline.closesOn) return { kind: 'none' };
+
+  const timeZone =
+    opportunity.deadline.timeZone ?? COUNTRY_TIMEZONES[opportunity.countryCode] ?? 'UTC';
+  const todayIso = getDateInTimeZone(now, timeZone);
+  const days = Math.round(
+    (Date.parse(`${opportunity.deadline.closesOn}T00:00:00Z`) -
+      Date.parse(`${todayIso}T00:00:00Z`)) /
+      86_400_000,
+  );
+  if (Number.isNaN(days) || days < 0) return { kind: 'none' };
+  if (days === 0) return { kind: 'today', urgent: true };
+  return { kind: 'days', days, urgent: days <= 14 };
 }

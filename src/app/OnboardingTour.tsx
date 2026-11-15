@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { prefersReducedMotion, useApp } from './appContextStore';
@@ -42,10 +42,27 @@ function OnboardingTourStage({
   const { t } = useTranslation();
   const [stepIndex, setStepIndex] = useState(0);
   const [box, setBox] = useState<HighlightBox | null>(null);
+  const [popoverHeight, setPopoverHeight] = useState(140);
+  const [heroCtaBottom, setHeroCtaBottom] = useState(0);
+  const popoverRef = useRef<HTMLElement | null>(null);
 
   const currentStep = TOUR_STEPS[stepIndex] ?? TOUR_STEPS[0]!;
 
   const syncPosition = useCallback(() => {
+    const measuredH = popoverRef.current?.offsetHeight;
+    if (measuredH && measuredH > 0) {
+      setPopoverHeight((prev) => (prev === measuredH ? prev : measuredH));
+    }
+    const ctas = document.querySelectorAll('[data-testid="hero-tour-cta"]');
+    let maxCtaBottom = 0;
+    ctas.forEach((el) => {
+      const r = el.getBoundingClientRect();
+      if (r.height > 0 && r.bottom > maxCtaBottom) {
+        maxCtaBottom = Math.ceil(r.bottom);
+      }
+    });
+    setHeroCtaBottom((prev) => (prev === maxCtaBottom ? prev : maxCtaBottom));
+
     const target = findVisibleTarget(currentStep.selector);
     if (!target) {
       setBox(null);
@@ -63,7 +80,7 @@ function OnboardingTourStage({
 
   useEffect(() => {
     const target = findVisibleTarget(currentStep.selector);
-    if (target && typeof target.scrollIntoView === 'function') {
+    if (stepIndex > 0 && target && typeof target.scrollIntoView === 'function') {
       target.scrollIntoView({
         block: 'nearest',
         behavior: prefersReducedMotion() ? 'auto' : 'smooth',
@@ -79,26 +96,53 @@ function OnboardingTourStage({
         onClose('dismissed');
       }
     };
+    const onPointerDown = (e: PointerEvent) => {
+      const targetEl = e.target as Element | null;
+      if (!targetEl) return;
+      if (
+        targetEl.closest('[data-testid="onboarding-tour"]') ||
+        targetEl.closest('header.site-header') ||
+        targetEl.closest('[data-testid="hero-tour-cta"]')
+      ) {
+        return;
+      }
+      onClose('dismissed');
+    };
     window.addEventListener('keydown', onKeyDown);
+    document.addEventListener('pointerdown', onPointerDown);
 
     return () => {
       window.cancelAnimationFrame(frameId);
       window.removeEventListener('resize', syncPosition);
       window.removeEventListener('scroll', syncPosition, true);
       window.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener('pointerdown', onPointerDown);
     };
-  }, [currentStep.selector, onClose, syncPosition]);
+  }, [currentStep.selector, onClose, stepIndex, syncPosition]);
 
   const viewportH = typeof window !== 'undefined' ? window.innerHeight : 800;
   const viewportW = typeof window !== 'undefined' ? window.innerWidth : 1024;
+  const popH = popoverHeight;
+  const fitsBelow = box ? box.top + box.height + 12 + popH <= viewportH - 8 : false;
+  const bottomReserved = viewportW < 768 ? 76 : 14;
+  const maxTop = Math.max(76, viewportH - bottomReserved - popH);
+  const safeFinderTop =
+    heroCtaBottom > 0 ? Math.min(Math.max(heroCtaBottom + 10, maxTop), maxTop) : maxTop;
 
-  const popoverTop = box
-    ? box.top + box.height + 16 + 220 < viewportH
-      ? box.top + box.height + 14
-      : Math.max(72, box.top - 220)
+  const rawPopoverTop = box
+    ? fitsBelow
+      ? box.top + box.height + 10
+      : currentStep.id === 'finder'
+        ? safeFinderTop
+        : Math.max(76, box.top - popH - 12)
     : 84;
+  const popoverTop = Math.min(rawPopoverTop, maxTop);
   const popoverLeft = box
-    ? Math.min(Math.max(12, box.left), Math.max(12, viewportW - 372))
+    ? !fitsBelow && currentStep.id === 'finder'
+      ? Math.max(12, viewportW - 376)
+      : !fitsBelow && box.width > 520
+        ? Math.max(12, Math.min(box.left + box.width - 360, viewportW - 372))
+        : Math.min(Math.max(12, box.left), Math.max(12, viewportW - 372))
     : 16;
 
   const isFirst = stepIndex === 0;
@@ -120,6 +164,7 @@ function OnboardingTourStage({
       )}
 
       <aside
+        ref={popoverRef}
         className="tour-popover"
         role="region"
         aria-label={t('tour.dialogLabel')}

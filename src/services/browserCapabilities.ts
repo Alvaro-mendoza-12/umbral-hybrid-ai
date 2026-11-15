@@ -99,7 +99,9 @@ export async function probeBrowserCapabilities(
       englishFallbackSupported: false,
       userAgentSummary,
       reason:
-        'Chrome Prompt API (LanguageModel) is not exposed in this browser context. On-device AI requires Chrome desktop 139+ with built-in AI enabled.',
+        locale === 'es'
+          ? 'La API Prompt de Chrome (LanguageModel) no está disponible en este navegador. La IA local en dispositivo requiere Chrome de escritorio 139+ con IA integrada activada.'
+          : 'Chrome Prompt API (LanguageModel) is not exposed in this browser context. On-device AI requires Chrome desktop 139+ with built-in AI enabled.',
     };
   }
 
@@ -126,15 +128,24 @@ export async function probeBrowserCapabilities(
   let reason: string | undefined;
   if (effectiveAvailability === 'unavailable') {
     reason =
-      'LanguageModel API exists, but the local Gemini Nano model is unavailable on this hardware/disk configuration.';
+      locale === 'es'
+        ? 'La API LanguageModel existe, pero el modelo local Gemini Nano no está disponible en esta configuración de hardware o disco.'
+        : 'LanguageModel API exists, but the local Gemini Nano model is unavailable on this hardware/disk configuration.';
   } else if (effectiveAvailability === 'downloadable') {
     reason =
-      'Local Gemini Nano weights can be downloaded on user interaction before offline inference.';
+      locale === 'es'
+        ? 'Los pesos locales de Gemini Nano pueden descargarse tras una acción del usuario antes de usar la IA sin conexión.'
+        : 'Local Gemini Nano weights can be downloaded on user interaction before offline inference.';
   } else if (effectiveAvailability === 'downloading') {
-    reason = 'Local Gemini Nano weights are currently downloading in Chrome.';
+    reason =
+      locale === 'es'
+        ? 'Los pesos locales de Gemini Nano se están descargando actualmente en Chrome.'
+        : 'Local Gemini Nano weights are currently downloading in Chrome.';
   } else if (locale !== 'en' && !requestedLocaleSupported && englishFallbackSupported) {
     reason =
-      'Chrome on-device model currently reports English-only support in this build; Spanish queries may fall back to cloud if consented.';
+      locale === 'es'
+        ? 'El modelo local en Chrome actualmente solo reporta soporte en inglés en esta versión; las consultas en español pueden recurrir a la nube si das tu consentimiento.'
+        : 'Chrome on-device model currently reports English-only support in this build; Spanish queries may fall back to cloud if consented.';
   }
 
   return {
