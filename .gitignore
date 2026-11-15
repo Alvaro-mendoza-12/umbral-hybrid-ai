@@ -22,6 +22,7 @@ blob-report/
 .firebase/
 .firebaserc
 .vercel/
+.vercel
 firebase-debug.log
 firebase-debug.*.log
 
@@ -30,4 +31,5 @@ firebase-debug.*.log
 Thumbs.db
 *.log
 
-.vercel
+# Local generated demo video deliverables (upload to YouTube rather than bloating Git)
+deliverables/
